@@ -1,0 +1,120 @@
+/* AuthPage.css - Modern, clean, responsive styles for the AuthPage */
+
+.auth-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 6px 32px rgba(30, 40, 90, 0.12);
+  padding: 2.5rem 2rem 2rem 2rem;
+  width: 350px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.auth-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #4e54c8;
+  margin-bottom: 1.5rem;
+}
+
+.tabs {
+  display: flex;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 0.75rem 0;
+  font-size: 1rem;
+  border: none;
+  background: none;
+  color: #4e54c8;
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
+  cursor: pointer;
+}
+.tabs button.active {
+  color: #222;
+  border-bottom: 2.5px solid #4e54c8;
+  background: linear-gradient(90deg, #f7f7fa 60%, #e6e8fc 100%);
+}
+
+.auth-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-form label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #4e54c8;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  text-align: left;
+}
+
+.auth-form input {
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #d4d7ee;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  background: #f7f7fa;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.auth-form input:focus {
+  border-color: #4e54c8;
+}
+
+.submit-btn {
+  background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.9rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 12px rgba(78, 84, 200, 0.08);
+}
+.submit-btn:disabled {
+  background: #bfc2e0;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #e74c3c;
+  background: #fff0f0;
+  border-radius: 0.3rem;
+  padding: 0.5rem 0.7rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.98rem;
+  text-align: center;
+}
+
+@media (max-width: 500px) {
+  .auth-card {
+    padding: 1.5rem 0.5rem 1.5rem 0.5rem;
+    width: 98vw;
+  }
+  .auth-title {
+    font-size: 1.5rem;
+  }
+}
