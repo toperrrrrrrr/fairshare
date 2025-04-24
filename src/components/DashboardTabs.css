@@ -61,7 +61,14 @@
   margin-top: 0.5rem;
   flex: 1;
   overflow-y: auto;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
   min-height: 0;
+}
+.dashboard-tab-content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
 }
 @media (max-width: 700px) {
   .dashboard-tab-content {

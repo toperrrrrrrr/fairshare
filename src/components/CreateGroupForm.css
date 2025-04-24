@@ -13,16 +13,21 @@
   text-align: center;
 }
 .create-group-input {
+  max-width: 320px;
   width: 100%;
-  padding: 0.8rem 1rem;
+  padding: 0.7rem 0.9rem;
   border-radius: 0.6rem;
   border: 1.5px solid #ecefff;
-  margin-bottom: 1.3rem;
-  font-size: 1.02rem;
+  margin-bottom: 1.1rem;
+  font-size: 1.01rem;
   outline: none;
   transition: border 0.15s;
   color: #2d3748;
   font-weight: 500;
+  box-sizing: border-box;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 .create-group-input::placeholder {
   color: #b0b7c3;
@@ -37,22 +42,24 @@
   cursor: not-allowed;
 }
 .create-group-btn {
+  max-width: 320px;
   width: 100%;
-  padding: 0.8rem 0;
+  padding: 0.7rem 0.9rem;
   background: linear-gradient(135deg, #667eea 0%, #8f94fb 100%);
   color: #fff;
   font-weight: 700;
-  font-size: 1.03rem;
+  font-size: 1.01rem;
   border: none;
   border-radius: 0.6rem;
   cursor: pointer;
   transition: background 0.16s, box-shadow 0.16s;
   margin-bottom: 0.5rem;
   position: relative;
-  height: 2.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
 }
 .create-group-btn:focus {
   box-shadow: 0 0 0 2px #8f94fb;
@@ -91,6 +98,16 @@
   margin-top: 0.2rem;
   text-align: center;
 }
+.modal-content, .modal-box, .modal {
+  max-width: 250px;
+  min-width: 0;
+  margin: 2.2rem auto;
+  padding: 1.05rem 1.05rem 1.15rem 1.05rem;
+  border-radius: 1.1rem;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(78, 84, 200, 0.10);
+  box-sizing: border-box;
+}
 @media (max-width: 700px) {
   .create-group-card {
     padding: 1.3rem 0.5rem 1rem 0.5rem;
@@ -99,5 +116,38 @@
   }
   .create-group-title {
     font-size: 1.05rem;
+  }
+  .modal-content, .modal-box, .modal {
+    max-width: 250px;
+  min-width: 0;
+  margin: 2.2rem auto;
+  padding: 1.05rem 1.05rem 1.15rem 1.05rem;
+  border-radius: 1.1rem;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(78, 84, 200, 0.10);
+  box-sizing: border-box;
+  }
+  .create-group-input, .create-group-btn {
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+@media (max-width: 480px) {
+  .modal-content, .modal-box, .modal {
+    max-width: 80vw;
+    width: 80vw;
+    margin: 1.2rem auto;
+    padding: 0.55rem 0.2rem 0.7rem 0.2rem;
+    border-radius: 0.9rem;
+  }
+  .create-group-input, .create-group-btn {
+    max-width: 100%;
+    min-width: 0;
+    font-size: 0.97rem;
+    padding: 0.6rem 0.6rem;
+  }
+  .create-group-title {
+    font-size: 0.97rem;
+    margin-bottom: 0.8rem;
   }
 }

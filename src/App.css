@@ -6,6 +6,16 @@ body {
   margin: 0;
 }
 
+body, html, #root {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+body::-webkit-scrollbar, html::-webkit-scrollbar, #root::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+
 .App {
   text-align: center;
   min-height: 100vh;
