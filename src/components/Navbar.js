@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { logoutUser } from '../services/authService';
-import { FiPieChart, FiChevronDown, FiLogOut } from 'react-icons/fi';
+import { FiPieChart, FiLogOut } from 'react-icons/fi';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -47,11 +47,12 @@ const Navbar = () => {
               aria-expanded={dropdownOpen}
               title="Account menu"
             >
-              {user.email[0]?.toUpperCase() || 'U'}
-              <FiChevronDown className="navbar-user-dropdown-icon" />
+              <span className="navbar-user-avatar-initial">
+                {user.email?.[0]?.toUpperCase() || 'U'}
+              </span>
             </button>
             {dropdownOpen && (
-              <div className="navbar-user-dropdown-menu" style={{position: 'absolute', top: '100%', left: 0, zIndex: 1}}>
+              <div className="navbar-user-dropdown-menu">
                 <div className="navbar-user-dropdown-email">{user.email}</div>
                 <button className="navbar-user-dropdown-item" onClick={handleLogout}>
                   <FiLogOut style={{marginRight: '0.5em'}} /> Logout

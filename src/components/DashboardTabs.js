@@ -49,7 +49,6 @@ const DashboardTabs = () => {
           {activeTab === 'groups' && (
             <>
               <GroupList refreshKey={refreshGroups} />
-              <CreateGroupForm onGroupCreated={() => setRefreshGroups(val => val + 1)} />
             </>
           )}
           {activeTab === 'friends' && (

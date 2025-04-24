@@ -22,8 +22,3 @@
   box-shadow: 0 8px 24px rgba(78, 84, 200, 0.23);
   transform: scale(1.08);
 }
-@media (min-width: 700px) {
-  .fab-create-group {
-    display: none;
-  }
-}

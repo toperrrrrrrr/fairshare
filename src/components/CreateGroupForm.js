@@ -54,28 +54,26 @@ const CreateGroupForm = ({ onGroupCreated }) => {
   };
 
   return (
-    <div className="create-group-card">
-      <form onSubmit={handleSubmit}>
-        <div className="create-group-title">Create a New Group</div>
-        <input
-          type="text"
-          placeholder="Group name"
-          value={groupName}
-          onChange={(e) => { setGroupName(e.target.value); setError(''); }}
-          required
-          disabled={loading}
-        />
-        <button
-          type="submit"
-          className={`create-group-btn${loading ? ' loading' : ''}`}
-          disabled={loading || !groupName.trim()}
-        >
-          {loading ? <span className="loader"></span> : 'Create Group'}
-        </button>
-        {error && <div className="create-group-error">{error}</div>}
-        {success && <div className="create-group-success">{success}</div>}
-      </form>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <div className="create-group-title">Create a New Group</div>
+      <input
+        type="text"
+        className="create-group-input"
+        placeholder="Group name"
+        value={groupName}
+        onChange={e => setGroupName(e.target.value)}
+        disabled={loading}
+      />
+      <button
+        className="create-group-btn"
+        type="submit"
+        disabled={loading}
+      >
+        {loading ? 'Creating...' : 'Create Group'}
+      </button>
+      {error && <div className="create-group-error">{error}</div>}
+      {success && <div className="create-group-success">{success}</div>}
+    </form>
   );
 };
 

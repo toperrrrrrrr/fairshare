@@ -147,6 +147,9 @@
   .group-list-section {
     padding: 0.7rem 0.2rem 0.5rem 0.2rem;
   }
+  .group-list-create-form-wrapper {
+    display: none !important;
+  }
 }
 
 /* Modal Create Group Overlay */

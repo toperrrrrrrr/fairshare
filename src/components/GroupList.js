@@ -162,13 +162,8 @@ const GroupList = ({ refreshKey }) => {
           )}
         </div>
       </div>
-      {!isMobile && (
-        <div className="group-list-create-form-wrapper">
-          <CreateGroupForm onGroupCreated={() => {}} />
-        </div>
-      )}
-      {isMobile && <FabCreateGroup onClick={() => setShowCreateModal(true)} />}
-      {isMobile && showCreateModal && (
+      <FabCreateGroup onClick={() => setShowCreateModal(true)} />
+      {showCreateModal && (
         <div
           className="modal-create-group-overlay"
           onClick={() => setShowCreateModal(false)}
