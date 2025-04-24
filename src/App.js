@@ -1,10 +1,9 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import FirebaseTestPage from "./pages/FirebaseTestPage";
 import "./App.css";
 
 function App() {
@@ -21,7 +20,11 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/firebase-test" element={<FirebaseTestPage />} />
+          {/* Redirect all these routes to dashboard for a single-page app experience */}
+          <Route path="/groups" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/friends" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/activity" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/account" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

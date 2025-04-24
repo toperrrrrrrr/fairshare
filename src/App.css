@@ -1,5 +1,17 @@
+body {
+  background: #f6f7fb;
+  font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  color: #23272f;
+  min-height: 100vh;
+  margin: 0;
+}
+
 .App {
   text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f6f7fb;
 }
 
 .App-logo {
@@ -26,6 +38,52 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.main-content {
+  flex: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 2rem 1.5rem;
+  box-sizing: border-box;
+}
+
+h2, h3, h4 {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 700;
+  color: #4e54c8;
+  margin-bottom: 1.2rem;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  background: #ecefff;
+}
+::-webkit-scrollbar-thumb {
+  background: #c3c6f1;
+  border-radius: 5px;
+}
+
+/* Remove default button outline and add subtle focus */
+button:focus, input:focus {
+  outline: 2px solid #8f94fb;
+  outline-offset: 2px;
+}
+
+/* Card utility class for future use */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(78, 84, 200, 0.08);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .main-content {
+    padding: 1.1rem 0.35rem 1.5rem 0.35rem;
+  }
 }
 
 @keyframes App-logo-spin {

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { registerUser, loginUser } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './AuthPage.css';
 
 const AuthPage = () => {
@@ -8,6 +10,15 @@ const AuthPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate('/dashboard');
+    }
+  }, [user, authLoading, navigate]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -26,12 +37,16 @@ const AuthPage = () => {
       } else {
         await registerUser(email, password);
       }
-      // Optionally redirect or update context here
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Authentication failed');
     }
     setLoading(false);
   };
+
+  if (authLoading) {
+    return <div className="auth-bg"><div className="auth-card"><div>Loading...</div></div></div>;
+  }
 
   return (
     <div className="auth-bg">
