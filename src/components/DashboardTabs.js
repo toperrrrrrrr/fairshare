@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import GroupList from './GroupList';
 import CreateGroupForm from './CreateGroupForm';
 import MobileBottomNav from './MobileBottomNav';
+import AccountTab from './AccountTab'; // Import the new AccountTab component
 import './DashboardTabs.css';
 
 const TABS = [
@@ -58,7 +59,7 @@ const DashboardTabs = () => {
             <div className="dashboard-placeholder">Activity feed coming soon!</div>
           )}
           {activeTab === 'account' && (
-            <div className="dashboard-placeholder">Account settings coming soon!</div>
+            <AccountTab /> // Replace the placeholder with the new AccountTab component
           )}
         </div>
       </div>

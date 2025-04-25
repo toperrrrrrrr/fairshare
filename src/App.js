@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
+import GroupDashboardPage from './pages/GroupDashboardPage';
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
@@ -20,6 +21,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/group/:groupId" element={<GroupDashboardPage />} />
           {/* Redirect all these routes to dashboard for a single-page app experience */}
           <Route path="/groups" element={<Navigate to="/dashboard" replace />} />
           <Route path="/friends" element={<Navigate to="/dashboard" replace />} />

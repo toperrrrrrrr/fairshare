@@ -221,3 +221,284 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar {
     max-width: 97vw;
   }
 }
+
+/* Join Group Button */
+.fab-join-group {
+  position: fixed;
+  bottom: 98px;
+  right: 32px;
+  z-index: 105;
+  background: linear-gradient(135deg, #8fd3f4 0%, #a6c1ee 100%);
+  color: #4e54c8;
+  border: none;
+  border-radius: 50px;
+  padding: 0.85rem 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(78, 84, 200, 0.10);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  outline: none;
+}
+.fab-join-group:hover, .fab-join-group:focus {
+  background: linear-gradient(135deg, #a6c1ee 0%, #8fd3f4 100%);
+  color: #363a52;
+  box-shadow: 0 4px 18px rgba(78, 84, 200, 0.17);
+}
+
+/* Modal for join group */
+.modal-join-group-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(68, 72, 128, 0.12);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-join-group-content {
+  background: #fff;
+  border-radius: 1.1rem;
+  box-shadow: 0 8px 32px rgba(78, 84, 200, 0.19);
+  padding: 2.2rem 2.4rem 1.7rem 2.4rem;
+  min-width: 310px;
+  max-width: 96vw;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* JoinGroupForm styles */
+.join-group-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.join-group-title {
+  font-weight: 700;
+  font-size: 1.13rem;
+  margin-bottom: 0.6rem;
+  color: #363a52;
+}
+.join-group-input {
+  padding: 0.7rem 1rem;
+  border-radius: 0.6rem;
+  border: 1.5px solid #ecefff;
+  font-size: 1.05rem;
+  font-weight: 500;
+  background: #f8faff;
+  color: #363a52;
+  outline: none;
+  transition: border 0.15s;
+}
+.join-group-input:focus {
+  border: 1.5px solid #8f94fb;
+}
+.join-group-btn {
+  background: linear-gradient(135deg, #8fd3f4 0%, #a6c1ee 100%);
+  color: #4e54c8;
+  border: none;
+  border-radius: 50px;
+  padding: 0.7rem 1.4rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(78, 84, 200, 0.10);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  outline: none;
+}
+.join-group-btn:hover, .join-group-btn:focus {
+  background: linear-gradient(135deg, #a6c1ee 0%, #8fd3f4 100%);
+  color: #363a52;
+  box-shadow: 0 4px 18px rgba(78, 84, 200, 0.17);
+}
+.join-group-error {
+  color: #e53e3e;
+  font-size: 0.98rem;
+  font-weight: 600;
+  margin-top: -0.7rem;
+}
+
+@media (max-width: 700px) {
+  .fab-join-group {
+    bottom: 88px;
+    right: 20px;
+    font-size: 0.97rem;
+    padding: 0.8rem 1.2rem;
+  }
+  .modal-join-group-content {
+    min-width: 90vw;
+    padding: 2.2rem 1.1rem 1.7rem 1.1rem;
+  }
+}
+
+/* --- Group Dashboard Mobile Improvements --- */
+@media (max-width: 650px) {
+  .group-dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 1.3rem 0.7rem 0.7rem 0.7rem;
+  }
+  .group-dashboard-main {
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 0.5rem 0.2rem 1.2rem 0.2rem;
+  }
+  .group-dashboard-main > div {
+    max-width: 100%;
+    min-width: 0;
+  }
+  .group-dashboard-card {
+    padding: 0.85rem 0.8rem 0.8rem 0.8rem;
+    margin-bottom: 1rem;
+  }
+  .group-dashboard-leave {
+    width: 100%;
+    padding: 0.8rem 0;
+    margin: 1.2rem 0 0 0;
+  }
+  .group-dashboard-members-list li {
+    font-size: 1.01rem;
+  }
+}
+
+/* Utility classes for GroupDashboardPage.js */
+.group-dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 2.2rem 2.1rem 0.7rem 2.1rem;
+  background: #f8faff;
+}
+.group-dashboard-main {
+  display: flex;
+  gap: 2.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem 2.1rem 2.5rem 2.1rem;
+}
+.group-dashboard-card {
+  background: #fff;
+  border-radius: 1.1rem;
+  box-shadow: 0 2px 12px rgba(78,84,200,0.07);
+  padding: 1.25rem 1.4rem 1.2rem 1.4rem;
+  margin-bottom: 1.7rem;
+}
+.group-dashboard-leave {
+  background: #f6ad55;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1.08rem;
+  padding: 0.82rem 2.1rem;
+  margin-top: 1.7rem;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(246,173,85,0.09);
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  justify-content: center;
+}
+.group-dashboard-members-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* --- Enhanced Desktop UI/UX for Group Dashboard --- */
+@media (min-width: 900px) {
+  .group-dashboard-header {
+    max-width: 1100px;
+    margin: 0 auto;
+    justify-content: space-between;
+    padding-top: 2.8rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1.5px solid #ecefff;
+    background: #f8faff;
+  }
+  .group-dashboard-header h2 {
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    margin-bottom: 0;
+  }
+  .group-dashboard-header > div {
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .group-dashboard-main {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2.7rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-top: 2.2rem;
+    padding-bottom: 2.5rem;
+  }
+  .group-dashboard-main > div:first-child {
+    flex: 2 1 0;
+    min-width: 0;
+  }
+  .group-dashboard-main > div:last-child {
+    flex: 1 1 320px;
+    max-width: 340px;
+    min-width: 250px;
+    position: sticky;
+    top: 32px;
+    align-self: flex-start;
+  }
+  .group-dashboard-card {
+    border-radius: 1.2rem;
+    padding: 1.6rem 2.1rem 1.6rem 2.1rem;
+    margin-bottom: 2.1rem;
+    box-shadow: 0 6px 32px rgba(78,84,200,0.09);
+    transition: box-shadow 0.18s, border 0.18s;
+    border: 1.5px solid #ecefff;
+  }
+  .group-dashboard-card:hover {
+    box-shadow: 0 10px 36px rgba(78,84,200,0.13);
+    border: 1.5px solid #b2b7ff;
+  }
+  .group-dashboard-card .group-dashboard-members-list li {
+    font-size: 1.08rem;
+    color: #4e54c8;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid #f3f0ff;
+  }
+  .group-dashboard-card .group-dashboard-members-list li:last-child {
+    border-bottom: none;
+  }
+  .group-dashboard-card .group-dashboard-members-list span {
+    font-weight: 600;
+  }
+  .group-dashboard-leave {
+    margin-top: 2.2rem;
+    font-size: 1.13rem;
+    border-radius: 13px;
+    box-shadow: 0 4px 18px rgba(246,173,85,0.11);
+    transition: background 0.18s, box-shadow 0.18s;
+  }
+  .group-dashboard-leave:hover {
+    background: #f8bb6a;
+    box-shadow: 0 8px 28px rgba(246,173,85,0.17);
+  }
+  .group-dashboard-card .group-dashboard-section-title {
+    font-size: 1.18rem;
+    color: #363a52;
+    font-weight: 800;
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.2px;
+  }
+  .group-dashboard-card .group-dashboard-section-title button {
+    font-size: 1.08rem;
+    border-radius: 7px;
+    padding: 5px 14px;
+    margin-left: 12px;
+  }
+}
