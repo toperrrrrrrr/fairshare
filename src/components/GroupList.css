@@ -40,6 +40,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar {
   display: flex;
   flex-direction: column;
   background: #f8faff;
+  position: relative;
 }
 .group-list-root.mobile {
   height: calc(100vh - 56px - 56px);
@@ -52,12 +53,16 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar {
   flex-direction: column;
   min-height: 0;
   padding: 1.1rem 0.7rem 0.5rem 0.7rem;
+  z-index: 2;
 }
 .group-list-title {
   font-weight: 700;
   font-size: 1.13rem;
   margin-bottom: 10px;
   color: #363a52;
+  background: #f8faff;
+  z-index: 3;
+  position: relative;
 }
 .group-list-scrollable {
   flex: 1 1 0;
@@ -66,6 +71,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar {
   padding-bottom: 1.5rem;
   scrollbar-width: thin;
   scrollbar-color: #ecefff #f8faff;
+  z-index: 1;
 }
 
 /* Group Card Styles */
@@ -223,27 +229,49 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar {
 }
 
 /* Join Group Button */
-.fab-join-group {
+.fab-stack {
   position: fixed;
-  bottom: 98px;
-  right: 32px;
-  z-index: 105;
-  background: linear-gradient(135deg, #8fd3f4 0%, #a6c1ee 100%);
-  color: #4e54c8;
-  border: none;
-  border-radius: 50px;
-  padding: 0.85rem 1.5rem;
-  font-size: 1.05rem;
-  font-weight: 700;
-  box-shadow: 0 2px 12px rgba(78, 84, 200, 0.10);
-  cursor: pointer;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-  outline: none;
+  right: 16px;
+  bottom: 76px;
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
-.fab-join-group:hover, .fab-join-group:focus {
-  background: linear-gradient(135deg, #a6c1ee 0%, #8fd3f4 100%);
-  color: #363a52;
-  box-shadow: 0 4px 18px rgba(78, 84, 200, 0.17);
+.fab-create-group, .fab-join-group {
+  position: static;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8f94fb 0%, #4e54c8 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  box-shadow: 0 6px 24px rgba(78,84,200,0.13);
+  border: none;
+  cursor: pointer;
+  margin: 0;
+  outline: none;
+  transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+}
+.fab-create-group:hover, .fab-join-group:hover {
+  background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+  box-shadow: 0 10px 32px rgba(78,84,200,0.18);
+  transform: translateY(-2px) scale(1.07);
+}
+@media (min-width: 650px) {
+  .fab-stack {
+    right: 24px;
+    bottom: 32px;
+    gap: 22px;
+  }
+  .fab-create-group, .fab-join-group {
+    width: 54px;
+    height: 54px;
+    font-size: 2rem;
+  }
 }
 
 /* Modal for join group */
@@ -500,5 +528,137 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar {
     border-radius: 7px;
     padding: 5px 14px;
     margin-left: 12px;
+  }
+}
+
+/* --- Friends List Styles --- */
+.friends-list-section {
+  background: #fff;
+  border-radius: 1.1rem;
+  box-shadow: 0 4px 24px rgba(78,84,200,0.10);
+  padding: 1.7rem 1.4rem 1.2rem 1.4rem;
+  margin: 1.2rem 0.6rem 1.2rem 0.6rem;
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.friends-list-title {
+  font-size: 1.28rem;
+  font-weight: 800;
+  color: #4e54c8;
+  margin-bottom: 1.1rem;
+  letter-spacing: 0.2px;
+}
+.friends-search-form {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+.friends-search-input {
+  flex: 1;
+  border-radius: 0.7rem;
+  border: 1.5px solid #ecefff;
+  padding: 0.7rem 1rem;
+  font-size: 1.05rem;
+  background: #f8faff;
+  transition: border 0.15s;
+}
+.friends-search-input:focus {
+  border: 1.5px solid #8f94fb;
+}
+.friends-search-btn {
+  background: linear-gradient(135deg, #8f94fb 0%, #4e54c8 100%);
+  color: #fff;
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.6rem 1rem;
+  font-size: 1.18rem;
+  cursor: pointer;
+  transition: background 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.friends-search-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.friends-list-error {
+  color: #e53e3e;
+  background: #fff0f0;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.7rem;
+  font-size: 0.98rem;
+}
+.friends-search-results {
+  background: #f8faff;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1.1rem;
+}
+.friends-search-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ecefff;
+}
+.friends-search-result-item:last-child {
+  border-bottom: none;
+}
+.friends-add-btn {
+  background: linear-gradient(135deg, #8f94fb 0%, #4e54c8 100%);
+  color: #fff;
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.3rem 0.7rem;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: background 0.18s;
+  margin-left: 10px;
+}
+.friends-add-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.friends-list {
+  margin-top: 1.5rem;
+}
+.friends-list-label {
+  font-size: 1.09rem;
+  font-weight: 700;
+  color: #363a52;
+  margin-bottom: 0.7rem;
+}
+.friends-list-loading {
+  color: #888;
+  margin-bottom: 0.7rem;
+}
+.friends-list-empty {
+  color: #b2b7ff;
+  font-size: 1.01rem;
+  margin-bottom: 0.7rem;
+}
+.friends-list-item {
+  display: flex;
+  align-items: center;
+  font-size: 1.08rem;
+  color: #363a52;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #ecefff;
+}
+.friends-list-item:last-child {
+  border-bottom: none;
+}
+@media (max-width: 700px) {
+  .friends-list-section {
+    padding: 1.1rem 0.2rem 1rem 0.2rem;
+    width: 97vw;
+    max-width: 97vw;
+    border-radius: 0.7rem;
+  }
+  .friends-list-title {
+    font-size: 1.1rem;
   }
 }

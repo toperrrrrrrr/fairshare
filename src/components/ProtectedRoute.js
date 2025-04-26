@@ -1,13 +1,14 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import SplashScreen from '../components/SplashScreen'; // Assuming SplashScreen is located in this directory
 
 // Usage: <ProtectedRoute><DashboardPage /></ProtectedRoute>
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <SplashScreen message="Authenticating..." />;
   }
 
   if (!user) {

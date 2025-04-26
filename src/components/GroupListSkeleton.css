@@ -1,0 +1,55 @@
+.group-list-skeleton-root {
+  margin-top: 12px;
+}
+.group-skeleton-card {
+  background: #fff;
+  border-radius: 1.1rem;
+  box-shadow: 0 2px 12px rgba(78,84,200,0.07);
+  border: 1.5px solid #ecefff;
+  margin-bottom: 1.5rem;
+  padding: 1.1rem 1.5rem 1.2rem 1.3rem;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.group-skeleton-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.group-skeleton-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #e3e8ee;
+}
+.group-skeleton-title {
+  flex: 1;
+  height: 20px;
+  border-radius: 8px;
+  background: #e3e8ee;
+  margin-left: 14px;
+}
+.group-skeleton-meta {
+  width: 80%;
+  height: 16px;
+  border-radius: 6px;
+  background: #e3e8ee;
+  margin-top: 8px;
+}
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; height: 100%; width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(200,200,255,0.12), transparent);
+  animation: shimmer-move 1.2s infinite;
+}
+@keyframes shimmer-move {
+  100% { left: 100%; }
+}

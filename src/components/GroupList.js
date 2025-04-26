@@ -4,9 +4,11 @@ import { db } from "../services/firebase";
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { FiUsers, FiClock } from "react-icons/fi";
-import FabCreateGroup from "./FabCreateGroup";
 import CreateGroupForm from "./CreateGroupForm";
 import JoinGroupForm from "./JoinGroupForm";
+import InviteFriendModal from './InviteFriendModal';
+import GroupListSkeleton from './GroupListSkeleton';
+import SplashScreen from './SplashScreen';
 import "./GroupList.css";
 
 function getRelativeTime(date) {
@@ -45,9 +47,10 @@ const GroupList = ({ refreshKey }) => {
   const { user } = useAuth();
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [routeLoading, setRouteLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteGroupId, setInviteGroupId] = useState(null);
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== "undefined" && window.innerWidth <= 700
   );
@@ -64,6 +67,7 @@ const GroupList = ({ refreshKey }) => {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
+    console.log('[GroupList] useEffect triggered. user:', user);
     let unsubscribeGroups = null;
     let unsubscribed = false;
 
@@ -74,6 +78,7 @@ const GroupList = ({ refreshKey }) => {
         async (userDoc) => {
           const userData = userDoc.exists() ? userDoc.data() : null;
           const groupIds = userData?.groupIds || [];
+          console.log('[GroupList] User doc snapshot:', userData, 'groupIds:', groupIds);
           if (groupIds.length === 0) {
             setGroups([]);
             setLoading(false);
@@ -81,33 +86,27 @@ const GroupList = ({ refreshKey }) => {
           }
           const groupsRef = collection(db, "groups");
           // Listen for real-time updates to the user's groups
-          const batches = [];
           let allGroups = [];
           let batchUnsubs = [];
           for (let i = 0; i < groupIds.length; i += 10) {
             const batch = groupIds.slice(i, i + 10);
+            // Capture batch in closure to avoid referencing loop variable
             const unsub = onSnapshot(
               query(groupsRef, where("__name__", "in", batch)),
-              (querySnapshot) => {
+              ((batchCopy) => (querySnapshot) => {
                 if (unsubscribed) return;
                 const newGroups = querySnapshot.docs.map((doc) => ({
                   id: doc.id,
                   ...doc.data(),
                 }));
+                console.log('[GroupList] Groups batch received:', newGroups);
                 allGroups = [
-                  ...allGroups.filter((g) => !batch.includes(g.id)),
+                  ...allGroups.filter((g) => !batchCopy.includes(g.id)),
                   ...newGroups,
                 ];
-                setGroups(
-                  [...allGroups].sort((a, b) => {
-                    if (a.createdAt && b.createdAt) {
-                      return b.createdAt.seconds - a.createdAt.seconds;
-                    }
-                    return (a.name || "").localeCompare(b.name || "");
-                  })
-                );
-                setLoading(false);
-              }
+                setGroups([...allGroups]);
+                setLoading(false); // Ensure loading is set to false after first group data is loaded
+              })(batch)
             );
             batchUnsubs.push(unsub);
           }
@@ -194,13 +193,8 @@ const GroupList = ({ refreshKey }) => {
               </div>
             </div>
           ))}
-          {routeLoading && (
-            <div className="group-list-loader">
-              <span className="loader"></span>
-            </div>
-          )}
           {loading && (
-            <div className="group-list-loading">Loading groups...</div>
+            <GroupListSkeleton />
           )}
           {!loading && groups.length === 0 && (
             <div className="group-list-empty">
@@ -210,10 +204,19 @@ const GroupList = ({ refreshKey }) => {
           )}
         </div>
       </div>
-      <FabCreateGroup onClick={() => setShowCreateModal(true)} />
-      <button className="fab-join-group" onClick={() => setShowJoinModal(true)}>
-        Join Group
-      </button>
+      <div className="fab-stack">
+        <button className="fab-create-group" aria-label="Create Group" onClick={() => setShowCreateModal(true)}>
+          <span aria-hidden="true" className="fab-icon">+</span>
+        </button>
+        <button className="fab-join-group" aria-label="Join Group" onClick={() => setShowJoinModal(true)}>
+          <svg className="fab-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </button>
+      </div>
       {showCreateModal && (
         <div
           className="modal-create-group-overlay"
@@ -237,20 +240,7 @@ const GroupList = ({ refreshKey }) => {
             >
               &times;
             </span>
-            <CreateGroupForm
-              onGroupCreated={(newGroup) => {
-                setShowCreateModal(false);
-                if (newGroup && !groups.some((g) => g.id === newGroup.id)) {
-                  setGroups((prev) => [
-                    {
-                      ...newGroup,
-                      createdAt: { seconds: Math.floor(Date.now() / 1000) },
-                    },
-                    ...prev,
-                  ]);
-                }
-              }}
-            />
+            <CreateGroupForm onClose={() => setShowCreateModal(false)} />
           </div>
         </div>
       )}
@@ -277,14 +267,12 @@ const GroupList = ({ refreshKey }) => {
             >
               &times;
             </span>
-            <JoinGroupForm
-              onJoined={() => {
-                setShowJoinModal(false);
-              }}
-              onClose={() => setShowJoinModal(false)}
-            />
+            <JoinGroupForm onClose={() => setShowJoinModal(false)} />
           </div>
         </div>
+      )}
+      {showInviteModal && inviteGroupId && (
+        <InviteFriendModal groupId={inviteGroupId} onClose={() => { setShowInviteModal(false); setInviteGroupId(null); }} />
       )}
     </div>
   );

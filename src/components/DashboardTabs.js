@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import GroupList from './GroupList';
-import CreateGroupForm from './CreateGroupForm';
 import MobileBottomNav from './MobileBottomNav';
-import AccountTab from './AccountTab'; // Import the new AccountTab component
+import AccountTab from './AccountTab'; 
+import FriendsList from './FriendsList'; 
+import ActivityTab from './ActivityTab';
 import './DashboardTabs.css';
 
 const TABS = [
@@ -14,7 +15,6 @@ const TABS = [
 
 const DashboardTabs = () => {
   const [activeTab, setActiveTab] = useState('groups');
-  const [refreshGroups, setRefreshGroups] = useState(0);
   const [isMobile, setIsMobile] = useState(window.matchMedia('(max-width: 700px)').matches);
 
   useEffect(() => {
@@ -48,18 +48,16 @@ const DashboardTabs = () => {
       <div className="dashboard-tabs">
         <div className="dashboard-tab-content">
           {activeTab === 'groups' && (
-            <>
-              <GroupList refreshKey={refreshGroups} />
-            </>
+            <GroupList />
           )}
           {activeTab === 'friends' && (
-            <div className="dashboard-placeholder">Friends feature coming soon!</div>
+            <FriendsList />
           )}
           {activeTab === 'activity' && (
-            <div className="dashboard-placeholder">Activity feed coming soon!</div>
+            <ActivityTab />
           )}
           {activeTab === 'account' && (
-            <AccountTab /> // Replace the placeholder with the new AccountTab component
+            <AccountTab /> 
           )}
         </div>
       </div>

@@ -3,6 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import { db } from '../services/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { isUsernameUnique } from '../services/userService';
+import AccountTabSkeleton from './AccountTabSkeleton';
+import SplashScreen from '../components/SplashScreen';
 
 const AccountTab = () => {
   const { user } = useAuth();
@@ -75,7 +77,7 @@ const AccountTab = () => {
     setSaving(false);
   };
 
-  if (loading) return <div style={{padding: 24}}>Loading account...</div>;
+  if (loading) return <AccountTabSkeleton />;
 
   return (
     <div style={{maxWidth: 380, margin: '0 auto', padding: '2rem 1rem'}}>

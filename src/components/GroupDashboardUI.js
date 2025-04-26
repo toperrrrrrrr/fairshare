@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { FiUsers, FiLogOut, FiPlus, FiUser, FiDollarSign } from "react-icons/fi";
 import "./GroupDashboardUI.css";
 
 const mockMembers = [
   { id: 1, username: "@hehe", owner: false },
-  { id: 2, username: "@toperrr", owner: true },
+  { id: 2, usxername: "@toperrr", owner: true },
 ];
 const mockExpenses = [
   { id: 1, desc: "Dinner", paidBy: "@hehe", amount: 40, date: "2025-04-24" },
@@ -16,17 +16,58 @@ const mockBalances = [
 ];
 
 export default function GroupDashboardUI() {
+  const [showExpenseForm, setShowExpenseForm] = useState(false);
   return (
     <div className="gdash-root">
       <div className="gdash-header">
         <button className="gdash-back">←</button>
-        <h2 className="gdash-title">yep</h2>
+        <div className="gdash-header-main">
+          <h2 className="gdash-title">yep</h2>
+          <div className="gdash-member-count">2 members</div>
+        </div>
         <div className="gdash-invite">Code: <span className="gdash-code">F7UZ9G4</span></div>
       </div>
       <div className="gdash-main">
         <div className="gdash-maincol">
           <div className="gdash-section gdash-expenses">
-            <div className="gdash-section-title">Expenses <button className="gdash-add-expense"><FiPlus /></button></div>
+            <div className="gdash-section-title">
+              Expenses
+              <button className="gdash-add-expense" onClick={() => setShowExpenseForm(v => !v)}><FiPlus /></button>
+            </div>
+            {/* Expense Form */}
+            {showExpenseForm && (
+              <form className="gdash-expense-form">
+                <input
+                  className="gdash-expense-input"
+                  type="text"
+                  placeholder="Description"
+                  name="desc"
+                  required
+                />
+                <input
+                  className="gdash-expense-input"
+                  type="number"
+                  placeholder="Amount"
+                  name="amount"
+                  min="0.01"
+                  step="0.01"
+                  required
+                />
+                <select className="gdash-expense-input" name="paidBy" required>
+                  <option value="">Paid by...</option>
+                  {mockMembers.map(m => (
+                    <option key={m.id} value={m.username}>{m.username.replace(/^@+/, "")}</option>
+                  ))}
+                </select>
+                <select className="gdash-expense-input" name="splitBetween" multiple>
+                  {mockMembers.map(m => (
+                    <option key={m.id} value={m.username}>{m.username.replace(/^@+/, "")}</option>
+                  ))}
+                </select>
+                <button className="gdash-expense-submit" type="submit">Add Expense</button>
+              </form>
+            )}
+            {/* End Expense Form */}
             {mockExpenses.map(exp => (
               <div className="gdash-expense-card" key={exp.id}>
                 <div className="gdash-expense-desc">{exp.desc}</div>
