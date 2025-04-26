@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import './GroupDashboardPage.css';
 import '../components/GroupDashboardUI.css';
 import { FiArrowLeft, FiSettings, FiUsers } from 'react-icons/fi';
 import InviteFriendModal from '../components/InviteFriendModal';
@@ -35,6 +36,7 @@ const GroupDashboardPage = () => {
   const [expenses, setExpenses] = useState([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -151,6 +153,7 @@ const GroupDashboardPage = () => {
 
   const handleConfirmDeleteExpense = async () => {
     if (!expenseToDelete) return;
+    setDeleteLoading(true);
     try {
       await deleteDoc(doc(db, 'groups', groupId, 'expenses', expenseToDelete.id));
       setDeleteModalOpen(false);
@@ -163,6 +166,8 @@ const GroupDashboardPage = () => {
       setExpenses(expenseList);
     } catch (err) {
       alert('Failed to delete expense.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -234,24 +239,35 @@ const GroupDashboardPage = () => {
                 <div style={{color:'#888',padding:'1.2rem 0'}}>No expenses yet.</div>
               ) : (
                 expenses.map(exp => (
-                  <div key={exp.id} className="gdash-expense-card">
-                    <div className="gdash-expense-desc">{exp.desc}</div>
-                    <div className="gdash-expense-meta">
-                      <span>₱{exp.amount}</span>
-                      <span>Paid by {exp.paidBy}</span>
-                      <span style={{fontSize:'0.97em',color:'#888'}}>{exp.date ? new Date(exp.date).toLocaleDateString() : (exp.createdAt ? new Date(exp.createdAt).toLocaleString() : '')}</span>
-                      <button className="gdash-expense-edit-btn" title="Edit expense" style={{background:'none',border:'none',marginLeft:8,cursor:'pointer',color:'#4e54c8'}} onClick={()=>handleEditExpense(exp)}>
+                  <div key={exp.id} className="gdash-expense-card improved-expense-card ux-expense-card">
+                    <div className="ux-expense-main">
+                      <div className="ux-expense-avatar">
+                        <span role="img" aria-label="expense">{exp.icon || '🧾'}</span>
+                      </div>
+                      <div className="ux-expense-info">
+                        <div className="ux-expense-header-row">
+                          <span className="ux-expense-desc">{exp.desc}</span>
+                          <span className="ux-expense-amount">₱{exp.amount}</span>
+                        </div>
+                        <div className="ux-expense-meta-row">
+                          <span className="ux-expense-paid-by">Paid by <b>@{exp.paidBy}</b></span>
+                          <span className="ux-expense-date">{exp.date ? new Date(exp.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : (exp.createdAt ? new Date(exp.createdAt).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '')}</span>
+                        </div>
+                        {exp.notes && (
+                          <div className="ux-expense-notes">
+                            <b>Notes:</b> {exp.notes}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="ux-expense-actions">
+                      <button className="gdash-expense-edit-btn ux-expense-action-btn" title="Edit expense" aria-label="Edit expense" onClick={()=>handleEditExpense(exp)}>
                         <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
                       </button>
-                      <button className="gdash-expense-delete-btn" title="Delete expense" style={{background:'none',border:'none',marginLeft:4,cursor:'pointer',color:'#e53e3e'}} onClick={()=>handleDeleteExpense(exp)}>
+                      <button className="gdash-expense-delete-btn ux-expense-action-btn" title="Delete expense" aria-label="Delete expense" onClick={()=>handleDeleteExpense(exp)}>
                         <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                       </button>
                     </div>
-                    {exp.notes && (
-                      <div className="gdash-expense-notes" style={{marginTop:4, fontSize:'0.98em', color:'#555', background:'#f4f5fb', borderRadius:6, padding:'6px 10px'}}>
-                        <b>Notes:</b> {exp.notes}
-                      </div>
-                    )}
                   </div>
                 ))
               )}
@@ -283,9 +299,10 @@ const GroupDashboardPage = () => {
       )}
       <DeleteExpenseModal
         open={deleteModalOpen}
-        onClose={() => { setDeleteModalOpen(false); setExpenseToDelete(null); }}
+        onClose={() => { if (!deleteLoading) { setDeleteModalOpen(false); setExpenseToDelete(null); } }}
         onConfirm={handleConfirmDeleteExpense}
         expense={expenseToDelete}
+        loading={deleteLoading}
       />
     </div>
   );
