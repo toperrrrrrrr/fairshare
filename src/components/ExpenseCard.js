@@ -108,9 +108,9 @@ const ExpenseCard = ({
       <div style={{gridColumn: 2, gridRow: 1, alignSelf: 'center', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.18rem'}}>
         <span className="text-xl font-bold text-gray-900 truncate leading-snug" style={{lineHeight: 1.22}}>{exp.desc}</span>
         <div className="flex flex-row items-center gap-1 text-sm text-gray-400 font-medium" style={{marginTop: '0.13rem'}}>
-          <span>Paid by <b className="text-violet-700 font-semibold">@{exp.paidBy.replace(/^@+/, '')}</b></span>
+          <span>{exp.paidByLabel || ''}</span>
           <span className="dot-separator">·</span>
-          <span>{exp.date ? new Date(exp.date).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : (exp.createdAt ? new Date(exp.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '')}</span>
+          <span>{exp.dateLabel || ''}</span>
         </div>
       </div>
       {/* Amount - Always right aligned, vertically centered */}

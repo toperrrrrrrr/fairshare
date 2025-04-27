@@ -5,6 +5,8 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { isUsernameUnique } from '../services/userService';
 import AccountTabSkeleton from './skeletons/AccountTabSkeleton';
 import SplashScreen from '../components/SplashScreen';
+import FeedbackSection from './FeedbackSection';
+import './AccountTab.css';
 
 const AccountTab = () => {
   const { user } = useAuth();
@@ -80,79 +82,32 @@ const AccountTab = () => {
   if (loading) return <AccountTabSkeleton />;
 
   return (
-    <div style={{maxWidth: 380, margin: '0 auto', padding: '2rem 1rem'}}>
-      <h2 style={{marginBottom: 18}}>Account Settings</h2>
-      <form onSubmit={handleSave}>
-        <label style={{display: 'block', marginBottom: 8, fontWeight: 600}}>
-          Username (unique)
+    <div className="account-tab-root">
+      <div className="account-section">
+        <div className="account-title">Profile</div>
+        <form onSubmit={handleSave} className="account-form">
+          <label htmlFor="username" className="account-label">Username</label>
           <input
+            id="username"
+            className="account-input"
             type="text"
             value={username}
             onChange={e => setUsername(e.target.value.replace(/[^a-zA-Z0-9_@]/g, ''))}
-            style={{
-              width: '100%',
-              padding: '0.7rem',
-              marginTop: 4,
-              marginBottom: 8,
-              borderRadius: 8,
-              border: username && (!usernameAvailable || !username.match(/^@?[a-zA-Z0-9_]{3,20}$/)) ? '1.5px solid #e53e3e' : '1.5px solid #ecefff',
-              fontSize: '1.05rem',
-            }}
-            required
-            minLength={3}
-            maxLength={20}
             disabled={saving}
-            placeholder="@yourhandle"
-            autoComplete="off"
+            maxLength={21}
+            autoComplete="username"
+            required
           />
-          {checking && <span style={{color: '#718096', marginLeft: 8, fontSize: '0.97rem'}}>Checking...</span>}
-          {!checking && username && username.length >= 3 && (
-            usernameAvailable ? (
-              <span style={{color: '#38a169', marginLeft: 8, fontSize: '0.97rem'}}>Available</span>
-            ) : (
-              <span style={{color: '#e53e3e', marginLeft: 8, fontSize: '0.97rem'}}>Taken</span>
-            )
-          )}
-        </label>
-        <label style={{display: 'block', marginBottom: 18, fontWeight: 600}}>
-          Email
-          <input
-            type="email"
-            value={email}
-            readOnly
-            style={{
-              width: '100%',
-              padding: '0.7rem',
-              marginTop: 4,
-              borderRadius: 8,
-              border: '1.5px solid #ecefff',
-              fontSize: '1.05rem',
-              background: '#f8faff',
-              color: '#888'
-            }}
-          />
-        </label>
-        <button
-          type="submit"
-          disabled={saving || !username || !usernameAvailable || !username.match(/^@?[a-zA-Z0-9_]{3,20}$/)}
-          style={{
-            background: '#4e54c8',
-            color: '#fff',
-            padding: '0.7rem 2.2rem',
-            border: 'none',
-            borderRadius: 8,
-            fontWeight: 700,
-            fontSize: '1.07rem',
-            cursor: saving ? 'not-allowed' : 'pointer',
-            opacity: saving ? 0.7 : 1,
-            marginBottom: 8,
-          }}
-        >
-          {saving ? 'Saving...' : 'Save Changes'}
-        </button>
-        {success && <div style={{color: '#38a169', marginTop: 6}}>{success}</div>}
-        {error && <div style={{color: '#e53e3e', marginTop: 6}}>{error}</div>}
-      </form>
+          <div className="account-email">Email: {email}</div>
+          <button className="account-save-btn" type="submit" disabled={saving || !usernameAvailable}>
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+          {success && <div style={{color: '#38a169', marginTop: 6}}>{success}</div>}
+          {error && <div style={{color: '#e53e3e', marginTop: 6}}>{error}</div>}
+        </form>
+      </div>
+      <hr className="account-divider" />
+      <FeedbackSection />
     </div>
   );
 };

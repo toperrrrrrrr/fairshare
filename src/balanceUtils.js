@@ -1,32 +1,35 @@
 /**
- * Calculate minimal balances between users based on all expenses.
- * Each expense is split equally among participants.
+ * Calculate minimal balances between users based on all transactions (expenses + settlements).
+ * Each expense is split equally among participants. Settlements reduce balances.
  *
- * @param {Array} expenses - Array of expense objects. Each should have:
- *   { amount: number, paidBy: string, participants: string[] }
+ * @param {Array} transactions - Array of transaction objects. Each should have:
+ *   { amount: number, paidBy: string, participants: string[], type: 'expense' | 'settlement', from, to }
  * @returns {Array} Array of balances: { from: string, to: string, amount: number }
- *
- * Example expense:
- *   { amount: 60, paidBy: 'alice', participants: ['alice','bob','carol'] }
- *
- * Example output:
- *   [ { from: 'bob', to: 'alice', amount: 20 }, { from: 'carol', to: 'alice', amount: 20 } ]
  */
-export function calculateBalances(expenses) {
+export function calculateBalances(transactions) {
   const netBalances = {};
 
   // Step 1: Compute net balances for each user
-  expenses.forEach(exp => {
-    const { amount, paidBy, participants } = exp;
-    if (!participants || participants.length === 0) return;
-    const split = amount / participants.length;
-
-    participants.forEach(user => {
-      if (!netBalances[user]) netBalances[user] = 0;
-      netBalances[user] -= split;
-    });
-    if (!netBalances[paidBy]) netBalances[paidBy] = 0;
-    netBalances[paidBy] += amount;
+  transactions.forEach(tx => {
+    if (tx.type === 'expense') {
+      const { amount, paidBy, participants } = tx;
+      if (!participants || participants.length === 0) return;
+      const split = amount / participants.length;
+      participants.forEach(user => {
+        if (!netBalances[user]) netBalances[user] = 0;
+        netBalances[user] -= split;
+      });
+      if (!netBalances[paidBy]) netBalances[paidBy] = 0;
+      netBalances[paidBy] += amount;
+    } else if (tx.type === 'settlement') {
+      // Settlement: from pays to
+      const { from, to, amount } = tx;
+      if (!from || !to || !amount) return;
+      if (!netBalances[from]) netBalances[from] = 0;
+      if (!netBalances[to]) netBalances[to] = 0;
+      netBalances[from] += amount;
+      netBalances[to] -= amount;
+    }
   });
 
   // Step 2: Settle debts (greedy, minimal transactions)
@@ -54,9 +57,9 @@ export function calculateBalances(expenses) {
 }
 
 // Example usage:
-// const expenses = [
-//   { amount: 60, paidBy: 'alice', participants: ['alice','bob','carol'] },
-//   { amount: 30, paidBy: 'bob', participants: ['alice','bob'] }
+// const transactions = [
+//   { type: 'expense', amount: 60, paidBy: 'alice', participants: ['alice','bob','carol'] },
+//   { type: 'settlement', from: 'bob', to: 'alice', amount: 20 }
 // ];
-// const balances = calculateBalances(expenses);
+// const balances = calculateBalances(transactions);
 // console.log(balances);

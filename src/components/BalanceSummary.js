@@ -6,7 +6,7 @@ import { addSettlementTransaction } from '../services/transactionService';
 // balances: [{ from: string, to: string, amount: number }]
 // currentUser: string (e.g., 'You' or user id)
 // getDisplayName: function (name) => string
-export default function BalanceSummary({ balances, currentUser, getDisplayName }) {
+export default function BalanceSummary({ balances, currentUser, getDisplayName, groupId, refreshTransactions }) {
   const [collapsed, setCollapsed] = useState(true);
   const summaryRef = useRef(null);
   const [settleModal, setSettleModal] = useState({ open: false, balance: null });
@@ -106,9 +106,6 @@ export default function BalanceSummary({ balances, currentUser, getDisplayName }
           if (!settleModal.balance) return;
           const { from, to } = settleModal.balance;
           try {
-            // Assume groupId is available in props or context (MVP: pass as prop)
-            // TODO: Replace 'groupId' with actual group ID as needed
-            const groupId = typeof window !== 'undefined' && window.currentGroupId ? window.currentGroupId : undefined;
             if (!groupId) {
               window.alert('Group ID missing. Cannot record transaction.');
               setSettleModal({ open: false, balance: null });
@@ -121,8 +118,8 @@ export default function BalanceSummary({ balances, currentUser, getDisplayName }
               amount,
               note,
             });
-            // Optionally: trigger UI refresh or callback
             window.alert('Settlement recorded!');
+            if (refreshTransactions) refreshTransactions();
           } catch (err) {
             window.alert('Failed to record settlement: ' + (err.message || err));
           }

@@ -9,7 +9,7 @@ import JoinGroupForm from '../JoinGroupForm';
 import InviteFriendModal from '../modals/InviteFriendModal';
 import GroupListSkeleton from '../skeletons/GroupListSkeleton';
 import SplashScreen from '../SplashScreen';
-import '../styles/GroupList.css';
+import '../../components/styles/GroupList.css';
 
 function getRelativeTime(date) {
   if (!date) return "";
@@ -205,10 +205,18 @@ const GroupList = ({ refreshKey }) => {
         </div>
       </div>
       <div className="fab-stack">
-        <button className="fab-create-group" aria-label="Create Group" onClick={() => setShowCreateModal(true)}>
+        <button
+          className="group-list-fab fab-create-group"
+          aria-label="Create Group"
+          onClick={e => { e.stopPropagation(); setShowCreateModal(true); }}
+        >
           <span aria-hidden="true" className="fab-icon">+</span>
         </button>
-        <button className="fab-join-group" aria-label="Join Group" onClick={() => setShowJoinModal(true)}>
+        <button
+          className="group-list-fab fab-join-group"
+          aria-label="Join Group"
+          onClick={e => { e.stopPropagation(); setShowJoinModal(true); }}
+        >
           <svg className="fab-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
@@ -220,11 +228,13 @@ const GroupList = ({ refreshKey }) => {
       {showCreateModal && (
         <div
           className="modal-create-group-overlay"
+          style={{zIndex: 2000}}
           onClick={() => setShowCreateModal(false)}
         >
           <div
             className="modal-create-group-content"
-            onClick={(e) => e.stopPropagation()}
+            style={{zIndex: 2001}}
+            onClick={e => e.stopPropagation()}
           >
             <span
               style={{
@@ -235,6 +245,7 @@ const GroupList = ({ refreshKey }) => {
                 cursor: "pointer",
                 color: "#8f94fb",
                 fontWeight: 700,
+                zIndex: 2002
               }}
               onClick={() => setShowCreateModal(false)}
             >
@@ -247,11 +258,13 @@ const GroupList = ({ refreshKey }) => {
       {showJoinModal && (
         <div
           className="modal-join-group-overlay"
+          style={{zIndex: 2000}}
           onClick={() => setShowJoinModal(false)}
         >
           <div
             className="modal-join-group-content"
-            onClick={(e) => e.stopPropagation()}
+            style={{zIndex: 2001}}
+            onClick={e => e.stopPropagation()}
           >
             <span
               style={{
@@ -262,6 +275,7 @@ const GroupList = ({ refreshKey }) => {
                 cursor: "pointer",
                 color: "#8f94fb",
                 fontWeight: 700,
+                zIndex: 2002
               }}
               onClick={() => setShowJoinModal(false)}
             >

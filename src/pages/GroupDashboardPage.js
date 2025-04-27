@@ -37,7 +37,7 @@ const GroupDashboardPage = () => {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [showExpenseForm, setShowExpenseForm] = useState(false);
-  const [expenses, setExpenses] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -86,37 +86,37 @@ const GroupDashboardPage = () => {
     fetchGroup();
   }, [groupId]);
 
-  useEffect(() => {
+  // --- Move fetchTransactions to top-level so it can be passed as a prop ---
+  const fetchTransactions = async () => {
     if (!groupId) return;
-    const fetchExpenses = async () => {
-      const expensesRef = collection(db, 'groups', groupId, 'expenses');
-      const q = query(expensesRef);
-      const snap = await getDocs(q);
-      const expenseList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setExpenses(expenseList);
-    };
-    fetchExpenses();
-  }, [groupId, showExpenseForm]); // refetch when modal closes
+    const transactionsRef = collection(db, 'groups', groupId, 'transactions');
+    const q = query(transactionsRef);
+    const snap = await getDocs(q);
+    let transactionList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    // Sort: newest first (by createdAt or date)
+    transactionList.sort((a, b) => {
+      const aTime = (a.date && typeof a.date === 'object' && a.date.seconds) ? a.date.seconds : (a.createdAt && typeof a.createdAt === 'object' && a.createdAt.seconds ? a.createdAt.seconds : new Date(a.date || a.createdAt || 0).getTime()/1000);
+      const bTime = (b.date && typeof b.date === 'object' && b.date.seconds) ? b.date.seconds : (b.createdAt && typeof b.createdAt === 'object' && b.createdAt.seconds ? b.createdAt.seconds : new Date(b.date || b.createdAt || 0).getTime()/1000);
+      return bTime - aTime;
+    });
+    setTransactions(transactionList);
+  };
 
   useEffect(() => {
-    if (!expenses || expenses.length === 0) {
+    fetchTransactions();
+  }, [groupId, showExpenseForm]);
+
+  useEffect(() => {
+    if (!transactions || transactions.length === 0) {
       setBalances([]);
       setBalancesLoading(false);
-      console.log('[Balance Debug] No expenses found:', expenses);
       return;
     }
     setBalancesLoading(true);
-    console.log('[Balance Debug] Fetched expenses:', expenses);
-    if (expenses.length > 0) {
-      expenses.forEach((exp, idx) => {
-        console.log(`[Balance Debug] Expense #${idx}:`, exp);
-      });
-    }
-    const calculated = calculateBalances(expenses);
-    console.log('[Balance Debug] Calculated balances:', calculated);
+    const calculated = calculateBalances(transactions);
     setBalances(calculated);
     setBalancesLoading(false);
-  }, [expenses]);
+  }, [transactions]);
 
   const handleLeaveOrDelete = async () => {
     if (!group || !user) return;
@@ -162,8 +162,8 @@ const GroupDashboardPage = () => {
     // Compute participants: all group members for now (MVP: split equally)
     const participants = members.map(m => m.username || m.email);
     // Save expense to Firestore with required fields
-    const expensesRef = collection(db, 'groups', groupId, 'expenses');
-    await addDoc(expensesRef, {
+    const transactionsRef = collection(db, 'groups', groupId, 'transactions');
+    await addDoc(transactionsRef, {
       desc: expenseData.desc,
       amount: Number(expenseData.amount),
       paidBy: expenseData.paidBy,
@@ -172,6 +172,7 @@ const GroupDashboardPage = () => {
       date: expenseData.date,
       notes: expenseData.notes,
       createdAt: new Date().toISOString(),
+      type: 'expense',
     });
     handleCloseExpenseModal();
   };
@@ -185,21 +186,27 @@ const GroupDashboardPage = () => {
     setDeleteModalOpen(true);
   };
 
-  const handleConfirmDeleteExpense = async () => {
+  const handleConfirmDeleteTransaction = async () => {
     if (!expenseToDelete) return;
     setDeleteLoading(true);
     try {
-      await deleteDoc(doc(db, 'groups', groupId, 'expenses', expenseToDelete.id));
+      await deleteDoc(doc(db, 'groups', groupId, 'transactions', expenseToDelete.id));
       setDeleteModalOpen(false);
       setExpenseToDelete(null);
-      // Refetch expenses from Firestore for consistency
-      const expensesRef = collection(db, 'groups', groupId, 'expenses');
-      const q = query(expensesRef);
+      // Refetch transactions from Firestore for consistency
+      const transactionsRef = collection(db, 'groups', groupId, 'transactions');
+      const q = query(transactionsRef);
       const snap = await getDocs(q);
-      const expenseList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setExpenses(expenseList);
+      let transactionList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // Sort: newest first (by createdAt or date)
+      transactionList.sort((a, b) => {
+        const aTime = (a.date && typeof a.date === 'object' && a.date.seconds) ? a.date.seconds : (a.createdAt && typeof a.createdAt === 'object' && a.createdAt.seconds ? a.createdAt.seconds : new Date(a.date || a.createdAt || 0).getTime()/1000);
+        const bTime = (b.date && typeof b.date === 'object' && b.date.seconds) ? b.date.seconds : (b.createdAt && typeof b.createdAt === 'object' && b.createdAt.seconds ? b.createdAt.seconds : new Date(b.date || b.createdAt || 0).getTime()/1000);
+        return bTime - aTime;
+      });
+      setTransactions(transactionList);
     } catch (err) {
-      alert('Failed to delete expense.');
+      alert('Failed to delete transaction.');
     } finally {
       setDeleteLoading(false);
     }
@@ -243,12 +250,33 @@ const GroupDashboardPage = () => {
   // Helper: get display name for a user key
   const getDisplayName = (key) => {
     const curKey = getCurrentUserKey();
-    // Compare lowercased for robustness
     if (key && curKey && key.toLowerCase() === curKey.toLowerCase()) return 'You';
-    // Try to find a member with this key
     const member = members.find(m => (m.username || m.email || m.id).toLowerCase() === (key || '').toLowerCase());
     return member ? (member.username || member.email || member.id) : key;
   };
+
+  // Helper: get user label (for settlements, which use 'from' and 'to' fields)
+  function getTransactionPaidBy(exp) {
+    if (exp.type === 'settlement') {
+      // Settlement: show 'Paid by {from} to {to}'
+      return `Paid by ${getDisplayName(exp.from)} to ${getDisplayName(exp.to)}`;
+    } else {
+      // Expense: show 'Paid by {paidBy}'
+      return `Paid by ${getDisplayName(exp.paidBy)}`;
+    }
+  }
+
+  // Helper: get transaction date (handle Firestore timestamps)
+  function getTransactionDate(exp) {
+    const dateVal = exp.date || exp.createdAt;
+    if (!dateVal) return '';
+    if (typeof dateVal === 'object' && dateVal.seconds) {
+      return new Date(dateVal.seconds * 1000).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+    const parsed = new Date(dateVal);
+    if (isNaN(parsed.getTime())) return '';
+    return parsed.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
 
   if (loading) return <div style={{ padding: 24 }}>Loading group...</div>;
   if (error)
@@ -286,23 +314,23 @@ const GroupDashboardPage = () => {
             <button className="gdash-add-expense-btn" onClick={handleOpenExpenseModal}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                 <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add Expense
+                Add Transaction
               </span>
             </button>
           </div>
           <AddExpenseModal open={showExpenseForm} onClose={handleCloseExpenseModal} members={members} onSubmit={handleExpenseSubmit} />
-          {/* Expense List Section */}
+          {/* Transaction List Section */}
           <div className="gdash-section gdash-expenses">
-            <div className="gdash-section-title">Expenses</div>
+            <div className="gdash-section-title">Transactions</div>
             <div className="gdash-expense-list">
-              {expenses.length === 0 ? (
-                <div style={{color:'#888',padding:'1.2rem 0'}}>No expenses yet.</div>
+              {transactions.length === 0 ? (
+                <div style={{color:'#888',padding:'1.2rem 0'}}>No transactions yet.</div>
               ) : (
-                expenses.map(exp => (
+                transactions.map(tx => (
                   <ExpenseCard
-                    key={exp.id}
-                    exp={exp}
-                    isSwiped={swipedExpenseId === exp.id}
+                    key={tx.id}
+                    exp={{ ...tx, paidByLabel: getTransactionPaidBy(tx), dateLabel: getTransactionDate(tx) }}
+                    isSwiped={swipedExpenseId === tx.id}
                     setSwipedExpenseId={setSwipedExpenseId}
                     handleEditExpense={handleEditExpense}
                     handleDeleteExpense={handleDeleteExpense}
@@ -314,7 +342,7 @@ const GroupDashboardPage = () => {
           {/* Balance Summary Card */}
           <div className="gdash-section gdash-balance-summary">
             <div className="gdash-section-title">Balance Summary</div>
-            <BalanceSummary balances={balances} currentUser={getCurrentUserKey()} getDisplayName={getDisplayName} />
+            <BalanceSummary balances={balances} currentUser={getCurrentUserKey()} getDisplayName={getDisplayName} groupId={groupId} refreshTransactions={fetchTransactions} />
           </div>
         </section>
       </main>
@@ -335,7 +363,7 @@ const GroupDashboardPage = () => {
       <DeleteExpenseModal
         open={deleteModalOpen}
         onClose={() => { if (!deleteLoading) { setDeleteModalOpen(false); setExpenseToDelete(null); } }}
-        onConfirm={handleConfirmDeleteExpense}
+        onConfirm={handleConfirmDeleteTransaction}
         expense={expenseToDelete}
         loading={deleteLoading}
       />

@@ -1,0 +1,205 @@
+.friends-list-section {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #f8faff;
+  position: relative;
+}
+.friends-list-title {
+  font-size: 1.38rem;
+  font-weight: 800;
+  color: #4e54c8;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.2px;
+  text-align: left;
+}
+.friends-search-form {
+  display: flex;
+  gap: 0.7rem;
+  margin-bottom: 1.3rem;
+}
+.friends-search-input {
+  flex: 1;
+  border-radius: 0.7rem;
+  border: 1.5px solid #ecefff;
+  font-size: 1.1rem;
+  padding: 0.62rem 1rem;
+  outline: none;
+  transition: border 0.16s;
+}
+.friends-search-input:focus {
+  border: 1.5px solid #8f94fb;
+}
+.friends-search-btn {
+  background: linear-gradient(135deg, #8f94fb 0%, #4e54c8 100%);
+  color: #fff;
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.6rem 1.1rem;
+  font-size: 1.18rem;
+  cursor: pointer;
+  transition: background 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.friends-search-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.friends-list-error {
+  color: #e53e3e;
+  background: #fff0f0;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.7rem;
+  font-size: 0.98rem;
+}
+.friends-search-results {
+  background: #f8faff;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1.1rem;
+}
+.friends-search-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ecefff;
+}
+.friends-search-result-item:last-child {
+  border-bottom: none;
+}
+.friends-add-btn {
+  background: linear-gradient(135deg, #8f94fb 0%, #4e54c8 100%);
+  color: #fff;
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.3rem 0.7rem;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: background 0.18s;
+  margin-left: 10px;
+}
+.friends-add-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.friends-pending-section, .friends-outgoing-section {
+  background: #f7f7fa;
+  border-radius: 0.8rem;
+  margin: 1.2rem 0 1.2rem 0;
+  padding: 1.1rem 1.1rem 0.7rem 1.1rem;
+  box-shadow: 0 2px 8px rgba(78,84,200,0.07);
+}
+.friends-pending-title, .friends-outgoing-title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 0.7rem;
+}
+.friends-pending-list-empty, .friends-outgoing-list-empty {
+  color: #b2b7ff;
+  font-size: 1.01rem;
+  margin-bottom: 0.7rem;
+}
+.friends-list {
+  margin-top: 1.7rem;
+}
+.friends-list-label {
+  font-size: 1.09rem;
+  font-weight: 700;
+  color: #4e54c8;
+  margin-bottom: 0.7rem;
+}
+.friends-list-empty {
+  color: #b2b7ff;
+  font-size: 1.01rem;
+  margin-bottom: 0.7rem;
+}
+.friends-list-item {
+  display: flex;
+  align-items: center;
+  font-size: 1.08rem;
+  color: #363a52;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #ecefff;
+}
+.friends-list-item:last-child {
+  border-bottom: none;
+}
+.friends-accept-btn, .friends-decline-btn, .friends-remove-btn {
+  border: none;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  font-size: 1.01rem;
+  padding: 0.38rem 1.1rem;
+  margin-left: 0.7rem;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s, box-shadow 0.14s;
+  box-shadow: 0 1px 4px rgba(78,84,200,0.07);
+  outline: none;
+}
+.friends-accept-btn {
+  background: linear-gradient(135deg, #6ee7b7 0%, #38b2ac 100%);
+  color: #fff;
+  margin-right: 0.4rem;
+}
+.friends-accept-btn:hover {
+  background: linear-gradient(135deg, #38b2ac 0%, #319795 100%);
+}
+.friends-decline-btn {
+  background: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
+  color: #fff;
+}
+.friends-decline-btn:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+.friends-remove-btn {
+  background: linear-gradient(135deg, #c7d2fe 0%, #6366f1 100%);
+  color: #fff;
+  margin-left: auto;
+  padding: 0.32rem 0.95rem;
+  font-size: 0.98rem;
+}
+.friends-remove-btn:hover {
+  background: linear-gradient(135deg, #6366f1 0%, #3730a3 100%);
+}
+.friends-outgoing-status {
+  background: #f7f7fa;
+  color: #8f94fb;
+  border-radius: 0.5rem;
+  padding: 0.18rem 0.8rem;
+  font-size: 0.97rem;
+  margin-left: 0.7rem;
+  font-weight: 500;
+}
+.friends-pending-item, .friends-outgoing-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0;
+  font-size: 1.04rem;
+}
+.friends-pending-list, .friends-outgoing-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+@media (max-width: 700px) {
+  .friends-list-section {
+    padding: 1.1rem 0.2rem 1rem 0.2rem;
+    width: 97vw;
+    max-width: 97vw;
+    border-radius: 0.7rem;
+  }
+  .friends-list-title {
+    font-size: 1.13rem;
+  }
+  .friends-pending-section, .friends-outgoing-section {
+    padding: 0.8rem 0.3rem 0.6rem 0.3rem;
+  }
+}

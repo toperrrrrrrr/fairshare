@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
 import GroupDashboardPage from './pages/GroupDashboardPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
@@ -22,6 +23,7 @@ function App() {
             }
           />
           <Route path="/group/:groupId" element={<GroupDashboardPage />} />
+          <Route path="/admin" element={<AdminDashboardPage />} />
           {/* Redirect all these routes to dashboard for a single-page app experience */}
           <Route path="/groups" element={<Navigate to="/dashboard" replace />} />
           <Route path="/friends" element={<Navigate to="/dashboard" replace />} />

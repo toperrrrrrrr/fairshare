@@ -17,16 +17,27 @@ export const AuthProvider = ({ children }) => {
       if (firebaseUser) {
         const userRef = doc(db, 'users', firebaseUser.uid);
         const userSnap = await getDoc(userRef);
+        let userData = {};
         if (!userSnap.exists()) {
-          await setDoc(userRef, {
+          userData = {
             name: firebaseUser.displayName || 'Anonymous',
             email: firebaseUser.email,
             groupIds: [],
             createdAt: serverTimestamp(),
-          });
+            accessLevel: 'USER', // Default accessLevel
+          };
+          await setDoc(userRef, userData);
           console.log('User document created!');
+        } else {
+          userData = userSnap.data();
         }
-        setUser(firebaseUser);
+        // Merge Firebase Auth and Firestore user fields
+        setUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          ...userData,
+        });
       } else {
         setUser(null);
       }

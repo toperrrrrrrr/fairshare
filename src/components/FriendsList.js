@@ -2,15 +2,18 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
-import { collection, doc, getDoc, getDocs, setDoc, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, onSnapshot } from 'firebase/firestore';
 import { FiUserPlus, FiUserCheck } from 'react-icons/fi';
 import FriendsListSkeleton from './skeletons/FriendsListSkeleton'; 
 import SplashScreen from './SplashScreen'; 
+import './FriendsList.css';
 
 const FriendsList = () => {
   const { user } = useAuth();
   const [friends, setFriends] = useState([]);
   const [friendUsernames, setFriendUsernames] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState([]); // incoming
+  const [outgoingRequests, setOutgoingRequests] = useState([]); // sent by me
   const [search, setSearch] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,25 +22,50 @@ const FriendsList = () => {
   // Fetch friends and their usernames
   useEffect(() => {
     if (!user) return;
-    const fetchFriends = async () => {
-      setLoading(true);
-      try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        const data = userDoc.exists() ? userDoc.data() : {};
-        setFriends(data.friends || []);
-        // Fetch usernames for friends
-        if (data.friends && data.friends.length > 0) {
-          const friendDocs = await Promise.all(data.friends.map(fid => getDoc(doc(db, 'users', fid))));
-          setFriendUsernames(friendDocs.map((fd, idx) => fd.exists() ? fd.data().username : data.friends[idx]));
-        } else {
-          setFriendUsernames([]);
-        }
-      } catch (err) {
-        setError('Failed to load friends.');
+    const unsub = onSnapshot(doc(db, 'users', user.uid), async (userDoc) => {
+      const data = userDoc.exists() ? userDoc.data() : {};
+      setFriends(data.friends || []);
+      // Fetch usernames for friends
+      if (data.friends && data.friends.length > 0) {
+        const friendDocs = await Promise.all(data.friends.map(fid => getDoc(doc(db, 'users', fid))));
+        setFriendUsernames(friendDocs.map((fd, idx) => fd.exists() ? fd.data().username : data.friends[idx]));
+      } else {
+        setFriendUsernames([]);
       }
-      setLoading(false);
+    });
+    return () => unsub();
+  }, [user]);
+
+  // Fetch incoming pending friend requests
+  useEffect(() => {
+    if (!user) return;
+    const unsub = onSnapshot(collection(db, 'users', user.uid, 'friendRequests'), (snap) => {
+      const reqs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(r => r.status === 'pending');
+      setPendingRequests(reqs);
+    });
+    return () => unsub();
+  }, [user]);
+
+  // Fetch outgoing friend requests
+  useEffect(() => {
+    if (!user) return;
+    let unsubscribes = [];
+    const fetchOutgoing = async () => {
+      // Get all users to check for outgoing requests
+      const usersSnap = await getDocs(collection(db, 'users'));
+      let outgoing = [];
+      await Promise.all(usersSnap.docs.map(async (uDoc) => {
+        if (uDoc.id === user.uid) return;
+        const reqSnap = await getDoc(doc(db, 'users', uDoc.id, 'friendRequests', user.uid));
+        if (reqSnap.exists() && reqSnap.data().status === 'pending') {
+          outgoing.push({ id: uDoc.id, ...uDoc.data(), reqId: reqSnap.id });
+        }
+      }));
+      setOutgoingRequests(outgoing);
     };
-    fetchFriends();
+    fetchOutgoing();
+    // No real-time for outgoing (unless you want to listen to all users)
+    return () => { unsubscribes.forEach(u => u && u()); };
   }, [user]);
 
   // --- SEARCH ---
@@ -79,7 +107,6 @@ const FriendsList = () => {
       // Fetch current user's username from Firestore
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       const myUsername = userDoc.exists() ? userDoc.data().username : user.email;
-
       const reqRef = doc(db, 'users', friend.id, 'friendRequests', user.uid);
       await setDoc(reqRef, {
         from: user.uid,
@@ -96,6 +123,45 @@ const FriendsList = () => {
       setError('Failed to send friend request.');
     }
     setLoading(false);
+  };
+
+  // --- ACCEPT FRIEND REQUEST ---
+  const handleAcceptRequest = async (req) => {
+    try {
+      // Add each other as friends
+      await updateDoc(doc(db, 'users', user.uid), { friends: friends.concat(req.from) });
+      const otherUserDoc = await getDoc(doc(db, 'users', req.from));
+      const otherFriends = otherUserDoc.exists() ? otherUserDoc.data().friends || [] : [];
+      await updateDoc(doc(db, 'users', req.from), { friends: [...otherFriends, user.uid] });
+      // Update request status
+      await updateDoc(doc(db, 'users', user.uid, 'friendRequests', req.from), { status: 'accepted' });
+    } catch (err) {
+      setError('Failed to accept request.');
+    }
+  };
+
+  // --- DECLINE FRIEND REQUEST ---
+  const handleDeclineRequest = async (req) => {
+    try {
+      await updateDoc(doc(db, 'users', user.uid, 'friendRequests', req.from), { status: 'declined' });
+    } catch (err) {
+      setError('Failed to decline request.');
+    }
+  };
+
+  // --- REMOVE FRIEND ---
+  const handleRemoveFriend = async (fid) => {
+    if (!window.confirm('Remove this friend?')) return;
+    try {
+      const newFriends = friends.filter(f => f !== fid);
+      await updateDoc(doc(db, 'users', user.uid), { friends: newFriends });
+      // Remove you from their friends
+      const otherUserDoc = await getDoc(doc(db, 'users', fid));
+      const otherFriends = otherUserDoc.exists() ? otherUserDoc.data().friends || [] : [];
+      await updateDoc(doc(db, 'users', fid), { friends: otherFriends.filter(f => f !== user.uid) });
+    } catch (err) {
+      setError('Failed to remove friend.');
+    }
   };
 
   return (
@@ -135,6 +201,40 @@ const FriendsList = () => {
           ))}
         </div>
       )}
+
+      {/* --- Pending Requests Section --- */}
+      <div className="friends-pending-section">
+        <div className="friends-pending-title">Pending Friend Requests</div>
+        {pendingRequests.length === 0 && <div className="friends-pending-list-empty">No pending requests.</div>}
+        {pendingRequests.length > 0 && (
+          <ul className="friends-pending-list">
+            {pendingRequests.map(req => (
+              <li key={req.from} className="friends-pending-item">
+                <span>@{req.fromUsername?.replace(/^@+/, '')}</span>
+                <button className="friends-accept-btn" onClick={() => handleAcceptRequest(req)}>Accept</button>
+                <button className="friends-decline-btn" onClick={() => handleDeclineRequest(req)}>Decline</button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* --- Outgoing Requests Section --- */}
+      <div className="friends-outgoing-section">
+        <div className="friends-outgoing-title">Outgoing Friend Requests</div>
+        {outgoingRequests.length === 0 && <div className="friends-outgoing-list-empty">No outgoing requests.</div>}
+        {outgoingRequests.length > 0 && (
+          <ul className="friends-outgoing-list">
+            {outgoingRequests.map(req => (
+              <li key={req.id} className="friends-outgoing-item">
+                <span>@{req.username?.replace(/^@+/, '') || req.email}</span>
+                <span className="friends-outgoing-status">Pending</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <div className="friends-list">
         <div className="friends-list-label">Your Friends:</div>
         {loading && <FriendsListSkeleton />} 
@@ -144,6 +244,7 @@ const FriendsList = () => {
             <li key={uname + i} className="friends-list-item">
               <FiUserCheck style={{ color: '#4e54c8', marginRight: 8 }} />
               <span>@{uname?.replace(/^@+/, '')}</span>
+              <button className="friends-remove-btn" onClick={() => handleRemoveFriend(friends[i])}>Remove</button>
             </li>
           ))}
         </ul>
