@@ -22,6 +22,10 @@ import InviteFriendModal from '../components/InviteFriendModal';
 import GroupSettingsSidebar from '../components/GroupSettingsSidebar';
 import AddExpenseModal from '../components/AddExpenseModal';
 import DeleteExpenseModal from '../components/DeleteExpenseModal';
+import ExpenseCard from '../components/ExpenseCard';
+import BalanceSummary from '../components/BalanceSummary';
+import { useSwipeable } from 'react-swipeable';
+import { calculateBalances } from '../balanceUtils';
 
 const GroupDashboardPage = () => {
   const { groupId } = useParams();
@@ -37,6 +41,9 @@ const GroupDashboardPage = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [swipedExpenseId, setSwipedExpenseId] = React.useState(null);
+  const [balances, setBalances] = useState([]);
+  const [balancesLoading, setBalancesLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -91,6 +98,26 @@ const GroupDashboardPage = () => {
     fetchExpenses();
   }, [groupId, showExpenseForm]); // refetch when modal closes
 
+  useEffect(() => {
+    if (!expenses || expenses.length === 0) {
+      setBalances([]);
+      setBalancesLoading(false);
+      console.log('[Balance Debug] No expenses found:', expenses);
+      return;
+    }
+    setBalancesLoading(true);
+    console.log('[Balance Debug] Fetched expenses:', expenses);
+    if (expenses.length > 0) {
+      expenses.forEach((exp, idx) => {
+        console.log(`[Balance Debug] Expense #${idx}:`, exp);
+      });
+    }
+    const calculated = calculateBalances(expenses);
+    console.log('[Balance Debug] Calculated balances:', calculated);
+    setBalances(calculated);
+    setBalancesLoading(false);
+  }, [expenses]);
+
   const handleLeaveOrDelete = async () => {
     if (!group || !user) return;
     setActionLoading(true);
@@ -132,11 +159,18 @@ const GroupDashboardPage = () => {
   const handleOpenExpenseModal = () => setShowExpenseForm(true);
   const handleCloseExpenseModal = () => setShowExpenseForm(false);
   const handleExpenseSubmit = async (expenseData) => {
-    // Save expense to Firestore
+    // Compute participants: all group members for now (MVP: split equally)
+    const participants = members.map(m => m.username || m.email);
+    // Save expense to Firestore with required fields
     const expensesRef = collection(db, 'groups', groupId, 'expenses');
     await addDoc(expensesRef, {
-      ...expenseData,
+      desc: expenseData.desc,
       amount: Number(expenseData.amount),
+      paidBy: expenseData.paidBy,
+      participants,
+      splitOption: expenseData.splitOption,
+      date: expenseData.date,
+      notes: expenseData.notes,
       createdAt: new Date().toISOString(),
     });
     handleCloseExpenseModal();
@@ -190,6 +224,32 @@ const GroupDashboardPage = () => {
     };
   }, [showExpenseForm]);
 
+  // Helper: get user id or email for current user
+  const getCurrentUserKey = () => {
+    if (!user) return '';
+    // Try to match against member username/email/id, fallback to lowercased email
+    const memberMatch = members.find(m =>
+      m.id === user.uid ||
+      m.email === user.email ||
+      (m.username && m.username === user.displayName)
+    );
+    if (memberMatch) {
+      return memberMatch.username || memberMatch.email || memberMatch.id;
+    }
+    // Fallback: use lowercased email or uid
+    return (user.email || user.uid).toLowerCase();
+  };
+
+  // Helper: get display name for a user key
+  const getDisplayName = (key) => {
+    const curKey = getCurrentUserKey();
+    // Compare lowercased for robustness
+    if (key && curKey && key.toLowerCase() === curKey.toLowerCase()) return 'You';
+    // Try to find a member with this key
+    const member = members.find(m => (m.username || m.email || m.id).toLowerCase() === (key || '').toLowerCase());
+    return member ? (member.username || member.email || member.id) : key;
+  };
+
   if (loading) return <div style={{ padding: 24 }}>Loading group...</div>;
   if (error)
     return <div style={{ padding: 24, color: "#e53e3e" }}>{error}</div>;
@@ -239,36 +299,14 @@ const GroupDashboardPage = () => {
                 <div style={{color:'#888',padding:'1.2rem 0'}}>No expenses yet.</div>
               ) : (
                 expenses.map(exp => (
-                  <div key={exp.id} className="gdash-expense-card improved-expense-card ux-expense-card">
-                    <div className="ux-expense-main">
-                      <div className="ux-expense-avatar">
-                        <span role="img" aria-label="expense">{exp.icon || '🧾'}</span>
-                      </div>
-                      <div className="ux-expense-info">
-                        <div className="ux-expense-header-row">
-                          <span className="ux-expense-desc">{exp.desc}</span>
-                          <span className="ux-expense-amount">₱{exp.amount}</span>
-                        </div>
-                        <div className="ux-expense-meta-row">
-                          <span className="ux-expense-paid-by">Paid by <b>@{exp.paidBy}</b></span>
-                          <span className="ux-expense-date">{exp.date ? new Date(exp.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : (exp.createdAt ? new Date(exp.createdAt).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '')}</span>
-                        </div>
-                        {exp.notes && (
-                          <div className="ux-expense-notes">
-                            <b>Notes:</b> {exp.notes}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="ux-expense-actions">
-                      <button className="gdash-expense-edit-btn ux-expense-action-btn" title="Edit expense" aria-label="Edit expense" onClick={()=>handleEditExpense(exp)}>
-                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-                      </button>
-                      <button className="gdash-expense-delete-btn ux-expense-action-btn" title="Delete expense" aria-label="Delete expense" onClick={()=>handleDeleteExpense(exp)}>
-                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                      </button>
-                    </div>
-                  </div>
+                  <ExpenseCard
+                    key={exp.id}
+                    exp={exp}
+                    isSwiped={swipedExpenseId === exp.id}
+                    setSwipedExpenseId={setSwipedExpenseId}
+                    handleEditExpense={handleEditExpense}
+                    handleDeleteExpense={handleDeleteExpense}
+                  />
                 ))
               )}
             </div>
@@ -276,10 +314,7 @@ const GroupDashboardPage = () => {
           {/* Balance Summary Card */}
           <div className="gdash-section gdash-balance-summary">
             <div className="gdash-section-title">Balance Summary</div>
-            {/* TODO: Map balances here. For now, show empty state. */}
-            <div className="gdash-empty-state">
-              No balances yet.
-            </div>
+            <BalanceSummary balances={balances} currentUser={getCurrentUserKey()} getDisplayName={getDisplayName} />
           </div>
         </section>
       </main>

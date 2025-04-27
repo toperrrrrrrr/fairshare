@@ -464,7 +464,9 @@
   }
   .gdash-expense-list, .gdash-balance-summary {
     width: 100%;
-    padding: 1.1rem 1rem 1.1rem 1rem;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 1.1rem 0.7rem 1.1rem 0.7rem;
     margin-bottom: 1.1rem;
   }
   .gdash-expense-list .gdash-section-title,

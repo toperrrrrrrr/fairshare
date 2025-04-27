@@ -1,0 +1,64 @@
+.gdash-balance-summary {
+  padding: 1.25rem 1.2rem 1.3rem 1.2rem;
+  margin-bottom: 1.7rem;
+}
+
+.balance-list-item-card {
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 12px rgba(78,84,200,0.11);
+  margin-bottom: 1.3rem;
+  padding: 1.1rem 1.4rem 1.1rem 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: box-shadow 0.18s, background 0.18s, transform 0.12s;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.1rem;
+}
+
+.balance-list-item-card:focus-within {
+  box-shadow: 0 0 0 3px #a5b4fc;
+  background: #f5f7ff;
+}
+
+.balance-list-item-card.owes {
+  border-left: 5px solid #ef4444;
+}
+
+.balance-list-item-card.owed {
+  border-left: 5px solid #22c55e;
+}
+
+.balance-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ede9fe;
+  color: #4e54c8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+@media (max-width: 480px) {
+  .gdash-balance-summary {
+    padding: 1rem 0.4rem 1.1rem 0.4rem;
+  }
+  .balance-list-item-card {
+    padding: 0.95rem 1.05rem 0.95rem 0.8rem;
+    border-radius: 1.1rem;
+    margin-bottom: 1.1rem;
+  }
+  .balance-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+}
