@@ -5,8 +5,9 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
-export const useAuth = () => useContext(AuthContext);
+export { AuthContext };
 
+// Remove useAuth definition (moved to hooks)
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);

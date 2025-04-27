@@ -1,0 +1,36 @@
+.group-list-skeleton-root {
+  background: #f3f4f6;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.group-list-skeleton-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  margin: 0 auto 0.5rem auto;
+}
+.group-list-skeleton-line {
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: 8px;
+  margin: 0.2rem 0;
+}
+.group-list-skeleton-line.short {
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.group-list-skeleton-line.medium {
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.group-list-skeleton-line.long {
+  width: 100%;
+}

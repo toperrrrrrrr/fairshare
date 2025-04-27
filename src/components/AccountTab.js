@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { db } from '../services/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { isUsernameUnique } from '../services/userService';
-import AccountTabSkeleton from './AccountTabSkeleton';
+import AccountTabSkeleton from './skeletons/AccountTabSkeleton';
 import SplashScreen from '../components/SplashScreen';
 
 const AccountTab = () => {

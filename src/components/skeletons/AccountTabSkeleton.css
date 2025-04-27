@@ -1,0 +1,36 @@
+.account-tab-skeleton-root {
+  background: #f3f4f6;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.account-tab-skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  margin: 0 auto 0.7rem auto;
+}
+.account-tab-skeleton-line {
+  height: 14px;
+  background: #e2e8f0;
+  border-radius: 8px;
+  margin: 0.3rem 0;
+}
+.account-tab-skeleton-line.short {
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.account-tab-skeleton-line.medium {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.account-tab-skeleton-line.long {
+  width: 100%;
+}

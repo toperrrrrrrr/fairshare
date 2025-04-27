@@ -2,15 +2,17 @@ body {
   background: #f6f7fb;
   font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
   color: #23272f;
-  min-height: 100vh;
+  height: 100vh;
   margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
-body, html, #root {
+body, #root {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
-body::-webkit-scrollbar, html::-webkit-scrollbar, #root::-webkit-scrollbar {
+body::-webkit-scrollbar, #root::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
   background: transparent !important;
@@ -18,7 +20,10 @@ body::-webkit-scrollbar, html::-webkit-scrollbar, #root::-webkit-scrollbar {
 
 .App {
   text-align: center;
-  min-height: 100vh;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   background: #f6f7fb;
@@ -94,6 +99,20 @@ button:focus, input:focus {
   .main-content {
     padding: 1.1rem 0.35rem 1.5rem 0.35rem;
   }
+}
+
+.app-scrollable-content {
+  height: calc(100vh - 60px); /* 60px = navbar min-height */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 2rem;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.app-scrollable-content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
 }
 
 @keyframes App-logo-spin {

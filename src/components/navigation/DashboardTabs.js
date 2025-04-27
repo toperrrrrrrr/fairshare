@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import GroupList from './GroupList';
+import GroupList from '../group/GroupList';
 import MobileBottomNav from './MobileBottomNav';
-import AccountTab from './AccountTab'; 
-import FriendsList from './FriendsList'; 
-import ActivityTab from './ActivityTab';
+import AccountTab from '../AccountTab'; 
+import FriendsList from '../FriendsList'; 
+import ActivityTab from '../ActivityTab';
 import './DashboardTabs.css';
 
 const TABS = [

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../services/firebase';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { collection, doc, getDocs, updateDoc, arrayUnion, deleteDoc, getDoc } from 'firebase/firestore';
 import { FiUserPlus, FiUserX } from 'react-icons/fi';
 import './ActivityTab.css';

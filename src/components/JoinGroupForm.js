@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { db } from "../services/firebase";
 import { collection, doc, getDocs, query, updateDoc, arrayUnion, where } from "firebase/firestore";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from '../hooks/useAuth';
+import './JoinGroupForm.css';
 
 const JoinGroupForm = ({ onJoined, onClose }) => {
   const [groupCode, setGroupCode] = useState("");
@@ -47,11 +48,11 @@ const JoinGroupForm = ({ onJoined, onClose }) => {
   };
 
   return (
-    <form onSubmit={handleJoin} className="join-group-form">
-      <div className="join-group-title">Join a Group</div>
+    <form onSubmit={handleJoin} className="form-container">
+      <div className="form-title">Join a Group</div>
       <input
         type="text"
-        className="join-group-input"
+        className="form-input"
         placeholder="Enter group code"
         value={groupCode}
         onChange={(e) => setGroupCode(e.target.value)}
@@ -59,13 +60,13 @@ const JoinGroupForm = ({ onJoined, onClose }) => {
         required
       />
       <button
-        className="join-group-btn"
+        className="form-btn"
         type="submit"
         disabled={loading || !groupCode.trim()}
       >
         {loading ? "Joining..." : "Join Group"}
       </button>
-      {error && <div className="join-group-error">{error}</div>}
+      {error && <div className="form-error">{error}</div>}
     </form>
   );
 };

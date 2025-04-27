@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './BalanceListItem.css';
+import SettleUpModal from './modals/SettleUpModal';
+import { addSettlementTransaction } from '../services/transactionService';
 
 // balances: [{ from: string, to: string, amount: number }]
 // currentUser: string (e.g., 'You' or user id)
@@ -7,6 +9,7 @@ import './BalanceListItem.css';
 export default function BalanceSummary({ balances, currentUser, getDisplayName }) {
   const [collapsed, setCollapsed] = useState(true);
   const summaryRef = useRef(null);
+  const [settleModal, setSettleModal] = useState({ open: false, balance: null });
 
   // Animate collapse from bottom up
   useEffect(() => {
@@ -25,6 +28,11 @@ export default function BalanceSummary({ balances, currentUser, getDisplayName }
 
   if (!balances || balances.length === 0) {
     return <div style={{padding:'1.3rem 0',color:'#aaa',textAlign:'center',fontSize:'1.05rem'}}>No balances to show 🎉</div>;
+  }
+
+  // Helper: is current user involved in this balance?
+  function isUserInvolved(b) {
+    return b.from === currentUser || b.to === currentUser;
   }
 
   return (
@@ -61,16 +69,70 @@ export default function BalanceSummary({ balances, currentUser, getDisplayName }
           } else {
             leftText = `${getDisplayName(b.from)} owes ${getDisplayName(b.to)}`;
           }
+          const isCurrentUserOwes = b.from === currentUser;
+          const isCurrentUserInvolved = isUserInvolved(b);
           return (
             <div key={i} className="balance-list-item-card" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
               <span style={{fontWeight:600,fontSize:'1.03rem'}}>{leftText}</span>
               <span className="amount-badge-clean bg-violet-200 text-violet-800 font-extrabold rounded-full px-7 py-2 text-2xl ml-3 whitespace-nowrap shadow border border-violet-200" style={{fontWeight:700,fontSize:'1.18rem'}}>
-                ${b.amount}
+                ₱{b.amount}
               </span>
+              {isCurrentUserOwes && (
+                <button
+                  className="gdash-settleup-btn"
+                  style={{border:'1px solid #a5b4fc',borderRadius:'7px',background:'#fff',color:'#4e54c8',fontWeight:600,fontSize:'0.98em',padding:'5px 13px',marginLeft:14,cursor:'pointer',transition:'background 0.15s'}}
+                  onClick={() => setSettleModal({ open: true, balance: b })}
+                >
+                  Settle Up
+                </button>
+              )}
+              {!isCurrentUserOwes && isCurrentUserInvolved && (
+                <button
+                  className="gdash-settleup-btn"
+                  style={{border:'1px solid #a5b4fc',borderRadius:'7px',background:'#fff',color:'#4e54c8',fontWeight:600,fontSize:'0.98em',padding:'5px 13px',marginLeft:14,cursor:'pointer',transition:'background 0.15s'}}
+                  onClick={() => setSettleModal({ open: true, balance: b })}
+                >
+                  Settle Up
+                </button>
+              )}
             </div>
           );
         })}
       </div>
+      <SettleUpModal
+        open={settleModal.open}
+        onClose={() => setSettleModal({ open: false, balance: null })}
+        onSubmit={async (amount, note) => {
+          if (!settleModal.balance) return;
+          const { from, to } = settleModal.balance;
+          try {
+            // Assume groupId is available in props or context (MVP: pass as prop)
+            // TODO: Replace 'groupId' with actual group ID as needed
+            const groupId = typeof window !== 'undefined' && window.currentGroupId ? window.currentGroupId : undefined;
+            if (!groupId) {
+              window.alert('Group ID missing. Cannot record transaction.');
+              setSettleModal({ open: false, balance: null });
+              return;
+            }
+            await addSettlementTransaction({
+              groupId,
+              fromUserId: from,
+              toUserId: to,
+              amount,
+              note,
+            });
+            // Optionally: trigger UI refresh or callback
+            window.alert('Settlement recorded!');
+          } catch (err) {
+            window.alert('Failed to record settlement: ' + (err.message || err));
+          }
+          setSettleModal({ open: false, balance: null });
+        }}
+        maxAmount={settleModal.balance?.amount || 0}
+        from={{ id: settleModal.balance?.from, name: getDisplayName(settleModal.balance?.from) }}
+        to={{ id: settleModal.balance?.to, name: getDisplayName(settleModal.balance?.to) }}
+        currency="₱"
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { logoutUser } from '../services/authService';
+import { useAuth } from '../../hooks/useAuth';
+import { logoutUser } from '../../services/authService';
 import { FiPieChart, FiLogOut } from 'react-icons/fi';
 import './Navbar.css';
 

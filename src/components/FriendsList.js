@@ -1,12 +1,11 @@
 // --- FRIENDS LIST COMPONENT ---
 import React, { useEffect, useState } from 'react';
 import { db } from '../services/firebase';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { collection, doc, getDoc, getDocs, setDoc, query, where } from 'firebase/firestore';
 import { FiUserPlus, FiUserCheck } from 'react-icons/fi';
-import './GroupList.css';
-import FriendsListSkeleton from './FriendsListSkeleton'; // Import FriendsListSkeleton
-import SplashScreen from '../components/SplashScreen'; // Import SplashScreen
+import FriendsListSkeleton from './skeletons/FriendsListSkeleton'; 
+import SplashScreen from './SplashScreen'; 
 
 const FriendsList = () => {
   const { user } = useAuth();
@@ -138,7 +137,7 @@ const FriendsList = () => {
       )}
       <div className="friends-list">
         <div className="friends-list-label">Your Friends:</div>
-        {loading && <FriendsListSkeleton />} // Replace SplashScreen with FriendsListSkeleton
+        {loading && <FriendsListSkeleton />} 
         {!loading && friendUsernames.length === 0 && <div className="friends-list-empty">No friends yet.</div>}
         <ul>
           {friendUsernames.map((uname, i) => (

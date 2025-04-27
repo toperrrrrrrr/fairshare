@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { db } from "../services/firebase";
+import { useAuth } from '../../hooks/useAuth';
+import { db } from '../../services/firebase';
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { FiUsers, FiClock } from "react-icons/fi";
-import CreateGroupForm from "./CreateGroupForm";
-import JoinGroupForm from "./JoinGroupForm";
-import InviteFriendModal from './InviteFriendModal';
-import GroupListSkeleton from './GroupListSkeleton';
-import SplashScreen from './SplashScreen';
-import "./GroupList.css";
+import CreateGroupForm from '../CreateGroupForm';
+import JoinGroupForm from '../JoinGroupForm';
+import InviteFriendModal from '../modals/InviteFriendModal';
+import GroupListSkeleton from '../skeletons/GroupListSkeleton';
+import SplashScreen from '../SplashScreen';
+import '../styles/GroupList.css';
 
 function getRelativeTime(date) {
   if (!date) return "";

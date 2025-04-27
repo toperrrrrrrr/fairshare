@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../services/firebase';
+import { db } from '../../services/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { useAuth } from '../context/AuthContext';
-import SplashScreen from '../components/SplashScreen'; // Import SplashScreen
+import { useAuth } from '../../hooks/useAuth';
+import SplashScreen from '../SplashScreen'; // Import SplashScreen
 
 const InviteFriendModal = ({ groupId, onClose }) => {
   const { user } = useAuth();

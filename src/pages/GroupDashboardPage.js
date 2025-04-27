@@ -13,15 +13,15 @@ import {
   where,
   addDoc,
 } from "firebase/firestore";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from "react-router-dom";
 import './GroupDashboardPage.css';
-import '../components/GroupDashboardUI.css';
+import '../components/group/GroupDashboardUI.css';
 import { FiArrowLeft, FiSettings, FiUsers } from 'react-icons/fi';
-import InviteFriendModal from '../components/InviteFriendModal';
-import GroupSettingsSidebar from '../components/GroupSettingsSidebar';
-import AddExpenseModal from '../components/AddExpenseModal';
-import DeleteExpenseModal from '../components/DeleteExpenseModal';
+import InviteFriendModal from '../components/modals/InviteFriendModal';
+import GroupSettingsSidebar from '../components/group/GroupSettingsSidebar';
+import AddExpenseModal from '../components/modals/AddExpenseModal';
+import DeleteExpenseModal from '../components/modals/DeleteExpenseModal';
 import ExpenseCard from '../components/ExpenseCard';
 import BalanceSummary from '../components/BalanceSummary';
 import { useSwipeable } from 'react-swipeable';
