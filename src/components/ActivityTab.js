@@ -89,26 +89,58 @@ const ActivityTab = () => {
             // Sort by createdAt desc
             allTrans.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
-            // Fetch group names for all transactions (if not already attached)
-            const fetchGroupNames = async () => {
+            // Fetch group names and user info for all transactions (if not already attached)
+            const fetchGroupNamesAndUsers = async () => {
               const groupNamesCache = {};
+              const userCache = {};
               const updatedTrans = await Promise.all(allTrans.map(async notif => {
-                if (notif.groupName) return notif;
-                if (groupNamesCache[notif.groupId]) {
-                  return { ...notif, groupName: groupNamesCache[notif.groupId] };
+                let groupName = notif.groupName;
+                if (!groupName) {
+                  if (groupNamesCache[notif.groupId]) {
+                    groupName = groupNamesCache[notif.groupId];
+                  } else {
+                    try {
+                      const groupDoc = await getDoc(doc(db, 'groups', notif.groupId));
+                      groupName = groupDoc.exists() ? groupDoc.data().name : notif.groupId;
+                      groupNamesCache[notif.groupId] = groupName;
+                    } catch {
+                      groupName = notif.groupId;
+                    }
+                  }
                 }
-                try {
-                  const groupDoc = await getDoc(doc(db, 'groups', notif.groupId));
-                  const groupName = groupDoc.exists() ? groupDoc.data().name : notif.groupId;
-                  groupNamesCache[notif.groupId] = groupName;
-                  return { ...notif, groupName };
-                } catch {
-                  return { ...notif, groupName: notif.groupId };
+                // Determine who performed the transaction
+                let fromUsername = notif.fromUsername;
+                let fromName = notif.fromName;
+                if (notif.paidBy) {
+                  // Expense entry: use paidBy value directly
+                  fromUsername = notif.paidBy;
+                  fromName = notif.paidBy;
+                } else {
+                  // Settlement entry: fetch user info by ID
+                  const actorId = notif.from;
+                  if ((!fromUsername || !fromName) && actorId) {
+                    if (userCache[actorId]) {
+                      fromUsername = userCache[actorId].username;
+                      fromName = userCache[actorId].name;
+                    } else {
+                      try {
+                        const userDoc = await getDoc(doc(db, 'users', actorId));
+                        if (userDoc.exists()) {
+                          fromUsername = userDoc.data().username || '';
+                          fromName = userDoc.data().name || '';
+                          userCache[actorId] = { username: fromUsername, name: fromName };
+                        }
+                      } catch {
+                        // fallback: leave as is
+                      }
+                    }
+                  }
                 }
+                return { ...notif, groupName, fromUsername, fromName };
               }));
               if (!isUnmounted) setTransactionNotifs([...updatedTrans]);
             };
-            fetchGroupNames();
+            fetchGroupNamesAndUsers();
           });
           unsubTransactions.push(unsub);
         }
@@ -244,7 +276,9 @@ const ActivityTab = () => {
                   Settlement in <strong>{notif.groupName || notif.groupId || ''}</strong>
                 </span>
                 <span style={{fontSize: '0.98rem', color: '#666', marginBottom: 6}}>
-                  by <b>{notif.fromUsername ? (notif.fromUsername.startsWith('@') ? notif.fromUsername : `@${notif.fromUsername}`) : notif.from || 'Unknown'}</b>
+                  by <b>{notif.fromUsername
+                    ? (notif.fromUsername.startsWith('@') ? notif.fromUsername : `@${notif.fromUsername}`)
+                    : (notif.fromName || notif.from || 'Someone')}</b>
                 </span>
                 <span style={{fontSize: '0.97rem', color: '#444', marginBottom: 4}}>
                   Payment: ₱{notif.amount} {notif.note && <span style={{color:'#8f94fb'}}>• {notif.note}</span>}
@@ -291,9 +325,13 @@ const ActivityTab = () => {
               >
                 <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#4e54c8', marginBottom: 3}}>
                   Transaction Added in <strong>{notif.groupName || notif.groupId || ''}</strong>
-                </span>
-                <span style={{fontSize: '0.98rem', color: '#666', marginBottom: 6}}>
-                  by <b>{notif.fromUsername ? (notif.fromUsername.startsWith('@') ? notif.fromUsername : `@${notif.fromUsername}`) : notif.from || 'Unknown'}</b>
+                  {notif.fromUsername || notif.fromName ? (
+                    <span style={{fontWeight: 400, color: '#7d81b3'}}> by <b>{notif.fromUsername && notif.fromUsername.trim() !== ''
+                      ? (notif.fromUsername.startsWith('@') ? notif.fromUsername : `@${notif.fromUsername}`)
+                      : notif.fromName || 'Someone'}</b></span>
+                  ) : (
+                    <span style={{fontWeight: 400, color: '#7d81b3'}}> by <b>Someone</b></span>
+                  )}
                 </span>
                 <span style={{fontSize: '0.97rem', color: '#444', marginBottom: 4}}>
                   Amount: ₱{notif.amount} {notif.note && <span style={{color:'#8f94fb'}}>• {notif.note}</span>}

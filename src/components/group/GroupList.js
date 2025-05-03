@@ -9,7 +9,9 @@ import JoinGroupForm from '../JoinGroupForm';
 import InviteFriendModal from '../modals/InviteFriendModal';
 import GroupListSkeleton from '../skeletons/GroupListSkeleton';
 import SplashScreen from '../SplashScreen';
+import FabStack from '../FabStack';
 import '../../components/styles/GroupList.css';
+import '../FabStack.css';
 
 function getRelativeTime(date) {
   if (!date) return "";
@@ -204,27 +206,8 @@ const GroupList = ({ refreshKey }) => {
           )}
         </div>
       </div>
-      <div className="fab-stack">
-        <button
-          className="group-list-fab fab-create-group"
-          aria-label="Create Group"
-          onClick={e => { e.stopPropagation(); setShowCreateModal(true); }}
-        >
-          <span aria-hidden="true" className="fab-icon">+</span>
-        </button>
-        <button
-          className="group-list-fab fab-join-group"
-          aria-label="Join Group"
-          onClick={e => { e.stopPropagation(); setShowJoinModal(true); }}
-        >
-          <svg className="fab-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-          </svg>
-        </button>
-      </div>
+      {/* FAB Stack for Create/Join Group */}
+      <FabStack onCreateGroup={() => setShowCreateModal(true)} onJoinGroup={() => setShowJoinModal(true)} />
       {showCreateModal && (
         <div
           className="modal-create-group-overlay"
